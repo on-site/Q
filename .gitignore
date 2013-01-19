@@ -1,0 +1,8 @@
+*~
+/build
+/dist
+/frizzle
+/lib
+/test/reports
+/test/build
+/test/lib

@@ -28,4 +28,8 @@ public class TestBase extends Assert {
     public static void assertNodeName(Node node, String expected) {
         assertEquals(node.getNodeName(), expected, "Node name");
     }
+
+    public static void assertNodeText(Node node, String expected) {
+        assertEquals(node.getTextContent(), expected, "Node text");
+    }
 }

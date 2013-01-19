@@ -1,10 +1,12 @@
 package com.onsitemanager.q;
 
 import com.google.common.collect.Iterators;
+import com.onsitemanager.util.frizzle.Frizzle;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -19,6 +21,7 @@ public class Q implements List<Element> {
     private final String selector;
     private final Element[] elements;
     private final Document document;
+    private Frizzle frizzle;
     private List<Element> list;
 
     // -------------- Constructors --------------
@@ -37,6 +40,41 @@ public class Q implements List<Element> {
      */
     public Q(Document document) {
         this("", new Element[] { document.getDocumentElement() }, document);
+    }
+
+    /**
+     * Select elements from the document based on the given Frizzle
+     * selector.
+     *
+     * @param selector The selector used to select elements.
+     * @param document The document to select from.
+     */
+    public Q(String selector, Document document) {
+        this.selector = selector;
+        this.document = document;
+        this.elements = frizzle().select(selector);
+    }
+
+    /**
+     * Select elements from the context based on the given Frizzle
+     * selector.
+     *
+     * @param selector The selector used to select elements.
+     * @param context The Q context to select from.
+     */
+    public Q(String selector, Q context) {
+        this.selector = selector;
+        this.document = context.document;
+
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element element : context.elements) {
+            for (Element e : frizzle().select(selector, element)) {
+                result.add(e);
+            }
+        }
+
+        this.elements = result.toArray(new Element[result.size()]);
     }
 
     private Q(String selector, Element[] elements, Document document) {
@@ -72,12 +110,38 @@ public class Q implements List<Element> {
      *
      * @param selector The selector used to select elements.
      * @param document The document to select from.
+     * @return A Q with selected items from the document.
      */
     public static Q $(String selector, Document document) {
-        throw new RuntimeException("TODO");
+        return new Q(selector, document);
     }
 
-    // -------------- List implemented methods --------------
+    /**
+     * Select elements from the context based on the given Frizzle
+     * selector.
+     *
+     * @param selector The selector used to select elements.
+     * @param context The Q context to select from.
+     * @return A Q with selected items from the context.
+     */
+    public static Q $(String selector, Q context) {
+        return new Q(selector, context);
+    }
+
+    // -------------- Private convenience methods --------------
+
+    private Frizzle frizzle() {
+        if (frizzle != null) {
+            return frizzle;
+        }
+
+        if (document == null) {
+            throw new IllegalStateException("That operation requires a known document!");
+        }
+
+        frizzle = new Frizzle(document);
+        return frizzle;
+    }
 
     private List<Element> asList() {
         if (list == null) {
@@ -86,6 +150,8 @@ public class Q implements List<Element> {
 
         return list;
     }
+
+    // -------------- List implemented methods --------------
 
     /**
      * Returns the number of elements selected.

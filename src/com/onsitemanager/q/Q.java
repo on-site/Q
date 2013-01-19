@@ -46,7 +46,7 @@ public class Q implements Iterable<Element> {
      * @param element The element to select.
      */
     public Q(Element element) {
-        this("", new Element[] { element }, null);
+        this("", asArray(element), null);
     }
 
     /**
@@ -55,7 +55,11 @@ public class Q implements Iterable<Element> {
      * @param elements The elements to select.
      */
     public Q(Element[] elements) {
-        this("", Arrays.copyOf(elements, elements.length), null);
+        this(elements, null);
+    }
+
+    private Q(Element[] elements, Document document) {
+        this("", Arrays.copyOf(elements, elements.length), document);
     }
 
     /**
@@ -145,6 +149,10 @@ public class Q implements Iterable<Element> {
         return new Q(elements);
     }
 
+    private static Q $(Element[] elements, Document document) {
+        return new Q(elements, document);
+    }
+
     /**
      * Select elements from the document based on the given Frizzle
      * selector.
@@ -170,6 +178,14 @@ public class Q implements Iterable<Element> {
     }
 
     // -------------- Private convenience methods --------------
+
+    private static Element[] asArray(Element element) {
+        if (element == null) {
+            return new Element[0];
+        }
+
+        return new Element[] { element };
+    }
 
     private Frizzle frizzle() {
         if (frizzle != null) {
@@ -215,26 +231,73 @@ public class Q implements Iterable<Element> {
         return toArray();
     }
 
+    /**
+     * Get the element at the given index.  If the index is negative,
+     * it will start at the end.  If the index is out of range, null
+     * will be returned.
+     *
+     * @param index The index to get.
+     * @return The element at the given index, or null.
+     */
     public Element get(int index) {
         if (index < 0) {
-            return elements[size() + index];
+            index = size() + index;
+        }
+
+        if (index < 0 || index >= size()) {
+            return null;
         }
 
         return elements[index];
     }
 
+    /**
+     * Retrieve the index of the first element amongst its siblings.
+     *
+     * @return The index among the siblings of the first element.
+     */
     public int index() {
-        throw new RuntimeException("TODO");
+        if (get(0) == null) {
+            return -1;
+        }
+
+        return first().prevAll().size();
     }
 
+    /**
+     * Retrieve the index of the first element in this Q in the given
+     * selector.
+     *
+     * @param selector The selector to index into.
+     * @return The index of the first element in this Q inside the
+     * given selector.
+     */
     public int index(String selector) {
-        throw new RuntimeException("TODO");
+        if (document() == null) {
+            return -1;
+        }
+
+        return $(selector, document()).index(get(0));
     }
 
+    /**
+     * Retrieve the index of the given element in the selected
+     * elements of this Q.
+     *
+     * @param element The element to retrieve the index.
+     * @return The index of the element in this Q.
+     */
     public int index(Element element) {
         return asList().indexOf(element);
     }
 
+    /**
+     * This behaves the same as index(Element), but the first selected
+     * element in the given Q is used as the element.
+     *
+     * @param q The Q to retrieve the index of the first element.
+     * @return The index of the first item in the q in this Q.
+     */
     public int index(Q q) {
         if (q.isEmpty()) {
             return -1;
@@ -252,6 +315,11 @@ public class Q implements Iterable<Element> {
         return elements.length;
     }
 
+    /**
+     * Return the selected elements as an array.
+     *
+     * @return The selected elements as an array.
+     */
     public Element[] toArray() {
         return asList().toArray(new Element[size()]);
     }
@@ -278,5 +346,37 @@ public class Q implements Iterable<Element> {
 
     public int hashCode() {
         return asList().hashCode();
+    }
+
+    // -------------- Uncategorized and untested --------------
+    // These are private until they are tested and categorized
+
+    private Q eq(int index) {
+        return $(get(index));
+    }
+
+    private Q first() {
+        return eq(0);
+    }
+
+    private Q prevAll() {
+        if (isEmpty()) {
+            return $(new Element[0], document());
+        }
+
+        // This may need to be reimplemented
+        List<Element> result = new LinkedList<Element>();
+        Element current = get(0);
+
+        while (current.getPreviousSibling() != null) {
+            if (!(current.getPreviousSibling() instanceof Element)) {
+                throw new AssertionError("Expected all previous siblings to be elements!");
+            }
+
+            current = (Element) current.getPreviousSibling();
+            result.add(current);
+        }
+
+        return $(result.toArray(new Element[result.size()]), document());
     }
 }

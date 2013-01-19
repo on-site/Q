@@ -6,6 +6,7 @@ import com.onsitemanager.util.TestBase;
 
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class QTest extends TestBase {
     @Test
@@ -33,6 +34,9 @@ public class QTest extends TestBase {
         assertNodeName(q.get(0), "sub");
         assertNodeName(q.get(1), "sub");
         assertEquals(q.document(), doc, "The element's document");
+
+        q = $((Element) null);
+        assertSelectedSize(q, 0);
     }
 
     @Test

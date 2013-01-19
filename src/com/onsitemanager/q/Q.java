@@ -4,11 +4,9 @@ import com.google.common.collect.Iterators;
 import com.onsitemanager.util.frizzle.Frizzle;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -17,7 +15,7 @@ import org.w3c.dom.Element;
  * The Q class implements an interface to interact with XML documents,
  * allowing easy manipulation and querying.
  */
-public class Q implements List<Element> {
+public class Q implements Iterable<Element> {
     private final String selector;
     private final Element[] elements;
     private final Document document;
@@ -43,6 +41,24 @@ public class Q implements List<Element> {
     }
 
     /**
+     * Construct with just a single element.
+     *
+     * @param element The element to select.
+     */
+    public Q(Element element) {
+        this("", new Element[] { element }, null);
+    }
+
+    /**
+     * Construct with an array of elements.
+     *
+     * @param elements The elements to select.
+     */
+    public Q(Element[] elements) {
+        this("", Arrays.copyOf(elements, elements.length), null);
+    }
+
+    /**
      * Select elements from the document based on the given Frizzle
      * selector.
      *
@@ -64,7 +80,7 @@ public class Q implements List<Element> {
      */
     public Q(String selector, Q context) {
         this.selector = selector;
-        this.document = context.document;
+        this.document = context.document();
 
         List<Element> result = new LinkedList<Element>();
 
@@ -80,7 +96,12 @@ public class Q implements List<Element> {
     private Q(String selector, Element[] elements, Document document) {
         this.selector = selector;
         this.elements = elements;
-        this.document = document;
+
+        if (document == null && elements.length > 0) {
+            this.document = elements[0].getOwnerDocument();
+        } else {
+            this.document = document;
+        }
     }
 
     // -------------- $ factory methods --------------
@@ -102,6 +123,26 @@ public class Q implements List<Element> {
      */
     public static Q $(Document document) {
         return new Q(document);
+    }
+
+    /**
+     * Construct with just a single element.
+     *
+     * @param element The element to select.
+     * @return A Q with the element selected.
+     */
+    public static Q $(Element element) {
+        return new Q(element);
+    }
+
+    /**
+     * Construct with an array of elements.
+     *
+     * @param elements The elements to select.
+     * @return A Q with the elements selected.
+     */
+    public static Q $(Element[] elements) {
+        return new Q(elements);
     }
 
     /**
@@ -135,11 +176,11 @@ public class Q implements List<Element> {
             return frizzle;
         }
 
-        if (document == null) {
+        if (document() == null) {
             throw new IllegalStateException("That operation requires a known document!");
         }
 
-        frizzle = new Frizzle(document);
+        frizzle = new Frizzle(document());
         return frizzle;
     }
 
@@ -151,26 +192,74 @@ public class Q implements List<Element> {
         return list;
     }
 
-    // -------------- List implemented methods --------------
+    // -------------- Internals --------------
+
+    /**
+     * Retrieve the document context for this Q, if there is a known
+     * one.
+     *
+     * @return The document context.
+     */
+    public Document document() {
+        return document;
+    }
+
+    // -------------- Miscellaneous --------------
+
+    /**
+     * Retrieve an array of all elements selected.
+     *
+     * @return An array of all elements selected.
+     */
+    public Element[] get() {
+        return toArray();
+    }
+
+    public Element get(int index) {
+        if (index < 0) {
+            return elements[size() + index];
+        }
+
+        return elements[index];
+    }
+
+    public int index() {
+        throw new RuntimeException("TODO");
+    }
+
+    public int index(String selector) {
+        throw new RuntimeException("TODO");
+    }
+
+    public int index(Element element) {
+        return asList().indexOf(element);
+    }
+
+    public int index(Q q) {
+        if (q.isEmpty()) {
+            return -1;
+        }
+
+        return index(q.get(0));
+    }
 
     /**
      * Returns the number of elements selected.
      *
      * @return The number of elements selected.
      */
-    @Override
     public int size() {
         return elements.length;
     }
 
-    @Override
-    public boolean isEmpty() {
-        return size() == 0;
+    public Element[] toArray() {
+        return asList().toArray(new Element[size()]);
     }
 
-    @Override
-    public boolean contains(Object o) {
-        return asList().contains(o);
+    // -------------- Additional utility methods --------------
+
+    public boolean isEmpty() {
+        return size() == 0;
     }
 
     /**
@@ -183,108 +272,11 @@ public class Q implements List<Element> {
         return Iterators.forArray(elements);
     }
 
-    @Override
-    public Object[] toArray() {
-        return asList().toArray();
-    }
-
-    @Override
-    public <T> T[] toArray(T[] a) {
-        return asList().toArray(a);
-    }
-
-    @Override
-    public boolean add(Element e) {
-        throw new UnsupportedOperationException("Q objects are immutable.");
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        throw new UnsupportedOperationException("Q objects are immutable.");
-    }
-
-    @Override
-    public boolean containsAll(Collection<?> c) {
-        return asList().containsAll(c);
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends Element> c) {
-        throw new UnsupportedOperationException("Q objects are immutable.");
-    }
-
-    @Override
-    public boolean addAll(int index, Collection<? extends Element> c) {
-        throw new UnsupportedOperationException("Q objects are immutable.");
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        throw new UnsupportedOperationException("Q objects are immutable.");
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        throw new UnsupportedOperationException("Q objects are immutable.");
-    }
-
-    @Override
-    public void clear() {
-        throw new UnsupportedOperationException("Q objects are immutable.");
-    }
-
-    @Override
     public boolean equals(Object o) {
         return asList().equals(o);
     }
 
-    @Override
     public int hashCode() {
         return asList().hashCode();
-    }
-
-    @Override
-    public Element get(int index) {
-        return elements[index];
-    }
-
-    @Override
-    public Element set(int index, Element element) {
-        throw new UnsupportedOperationException("Q objects are immutable.");
-    }
-
-    @Override
-    public void add(int index, Element element) {
-        throw new UnsupportedOperationException("Q objects are immutable.");
-    }
-
-    @Override
-    public Element remove(int index) {
-        throw new UnsupportedOperationException("Q objects are immutable.");
-    }
-
-    @Override
-    public int indexOf(Object o) {
-        return asList().indexOf(o);
-    }
-
-    @Override
-    public int lastIndexOf(Object o) {
-        return asList().lastIndexOf(o);
-    }
-
-    @Override
-    public ListIterator<Element> listIterator() {
-        return asList().listIterator();
-    }
-
-    @Override
-    public ListIterator<Element> listIterator(int index) {
-        return asList().listIterator(index);
-    }
-
-    @Override
-    public List<Element> subList(int fromIndex, int toIndex) {
-        return asList().subList(fromIndex, toIndex);
     }
 }

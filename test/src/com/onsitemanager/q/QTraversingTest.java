@@ -62,6 +62,13 @@ public class QTraversingTest extends TestBase {
         assertEquals($("sub:eq(2)", q.document()).prevAll().size(), 2, "Size");
         assertEquals($("sub:eq(2)", q.document()).prevAll().get(0), q.get(1), "Element");
         assertEquals($("sub:eq(2)", q.document()).prevAll().get(1), q.get(0), "Element");
+
+        q = $("sub", document("<test><container1><sub/><sub>content</sub> sibling content <sub>More content</sub></container1>" +
+                              "<container2><sub/><sub>content</sub> sibling content <sub>More content</sub></container2></test>"));
+        assertEquals($("container1 sub:eq(2), container2 sub:eq(1)", q.document()).prevAll().size(), 3, "Size");
+        assertEquals($("container1 sub:eq(2), container2 sub:eq(1)", q.document()).prevAll().get(0), q.get(1), "Element");
+        assertEquals($("container1 sub:eq(2), container2 sub:eq(1)", q.document()).prevAll().get(1), q.get(0), "Element");
+        assertEquals($("container1 sub:eq(2), container2 sub:eq(1)", q.document()).prevAll().get(2), q.get(3), "Element");
     }
 
     @Test

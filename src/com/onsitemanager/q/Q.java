@@ -414,9 +414,9 @@ public class Q implements Iterable<Element> {
 
     /**
      * Filter the currently selected elements to be just the previous
-     * sibling elements of the first selected element.
+     * sibling elements of all the selected elements.
      *
-     * @return A Q of all previous siblings of the first element.
+     * @return A Q of all previous siblings of each selected element.
      */
     public Q prevAll() {
         return prevAll(null);
@@ -424,12 +424,12 @@ public class Q implements Iterable<Element> {
 
     /**
      * Filter the currently selected elements to be just the previous
-     * sibling elements of the first selected element.  Only include
+     * sibling elements of all the selected elements.  Only include
      * elements that match the given selector (if it is non-null).
      *
      * @param selector Selector to filter the returned elements, if
      * non-null.
-     * @return A Q of all previous siblings of the first element.
+     * @return A Q of all previous siblings of each selected element.
      */
     public Q prevAll(String selector) {
         if (isEmpty()) {
@@ -437,20 +437,21 @@ public class Q implements Iterable<Element> {
         }
 
         List<Element> result = new LinkedList<Element>();
-        Node current = get(0);
 
-        while (current.getPreviousSibling() != null) {
-            current = current.getPreviousSibling();
+        for (Node current : this) {
+            while (current.getPreviousSibling() != null) {
+                current = current.getPreviousSibling();
 
-            if (!(current instanceof Element)) {
-                continue;
+                if (!(current instanceof Element)) {
+                    continue;
+                }
+
+                if (selector != null && !frizzle().matchesSelector((Element) current, selector)) {
+                    continue;
+                }
+
+                result.add((Element) current);
             }
-
-            if (selector != null && !frizzle().matchesSelector((Element) current, selector)) {
-                continue;
-            }
-
-            result.add((Element) current);
         }
 
         return $(result.toArray(new Element[result.size()]), document()).setPreviousQ(this);

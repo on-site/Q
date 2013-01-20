@@ -390,7 +390,16 @@ public class Q implements Iterable<Element> {
 
     // has()
     // is()
-    // last()
+
+    /**
+     * Reduce the selected elements to the last element.
+     *
+     * @return A new Q with just the last item.
+     */
+    public Q last() {
+        return eq(-1);
+    }
+
     // map()
     // next()
     // nextAll()

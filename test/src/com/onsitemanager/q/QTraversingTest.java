@@ -18,6 +18,7 @@ public class QTraversingTest extends TestBase {
 
         // Testing other filtering methods to ensure they pop properly
         assertEquals(q.first().end(), q, "The resulting Q");
+        assertEquals(q.last().end(), q, "The resulting Q");
     }
 
     @Test
@@ -41,5 +42,13 @@ public class QTraversingTest extends TestBase {
         assertEquals(q.first().size(), 1, "Size");
         assertEquals(q.first().get(0), q.get(0), "Selected item");
         assertEquals(q.first().first().get(0), q.get(0), "Selected item");
+    }
+
+    @Test
+    public void last() throws Exception {
+        Q q = $("sub", document("<test><sub/><sub>content</sub></test>"));
+        assertEquals(q.last().size(), 1, "Size");
+        assertEquals(q.last().get(0), q.get(1), "Selected item");
+        assertEquals(q.last().last().get(0), q.get(1), "Selected item");
     }
 }

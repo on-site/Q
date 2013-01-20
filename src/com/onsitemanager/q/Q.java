@@ -1,7 +1,7 @@
 package com.onsitemanager.q;
 
 import com.google.common.collect.Iterators;
-import com.onsitemanager.util.frizzle.Frizzle;
+import com.on_site.frizzle.Frizzle;
 
 import java.util.Arrays;
 import java.util.Iterator;

@@ -1,7 +1,7 @@
 package com.onsitemanager.util;
 
 import com.onsitemanager.q.Q;
-import com.onsitemanager.util.DOMUtil;
+import com.on_site.util.DOMUtil;
 
 import org.testng.Assert;
 import org.w3c.dom.Document;

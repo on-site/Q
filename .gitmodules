@@ -1,0 +1,3 @@
+[submodule "frizzle"]
+	path = frizzle
+	url = https://github.com/on-site/frizzle.git

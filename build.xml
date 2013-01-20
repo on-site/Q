@@ -7,7 +7,11 @@
   <property name="test.lib" location="test/lib" />
   <property name="test.build" location="test/build" />
   <property name="test.reports" location="test/reports" />
-  <property name="testng.jar" location="${test.lib}/testng-6.3.jar" />
+  <property name="rhino.jar" location="${lib}/js.jar" />
+  <property name="guava.jar" location="${lib}/guava-14.0-rc1.jar" />
+  <property name="log4j.jar" location="${lib}/log4j-1.2.17.jar" />
+  <property name="frizzle.jar" location="${lib}/frizzle.jar" />
+  <property name="testng.jar" location="${test.lib}/testng-6.8.jar" />
 
   <path id="classpath">
     <fileset dir="${lib}">
@@ -39,8 +43,31 @@
 
   <target name="init">
     <mkdir dir="${build}" />
-    <mkdir dir="${test.build}" />
     <mkdir dir="${dist}" />
+
+    <fail message="Missing ${rhino.jar}, please download it.">
+      <condition>
+        <not><available file="${rhino.jar}" /></not>
+      </condition>
+    </fail>
+
+    <fail message="Missing ${guava.jar}, please download it.">
+      <condition>
+        <not><available file="${guava.jar}" /></not>
+      </condition>
+    </fail>
+
+    <fail message="Missing ${log4j.jar}, please download it.">
+      <condition>
+        <not><available file="${log4j.jar}" /></not>
+      </condition>
+    </fail>
+
+    <fail message="Missing ${frizzle.jar}, please build or download it.">
+      <condition>
+        <not><available file="${frizzle.jar}" /></not>
+      </condition>
+    </fail>
   </target>
 
   <target name="compile" depends="init">
@@ -51,7 +78,17 @@
     <jar jarfile="${dist}/q.jar" basedir="${build}" />
   </target>
 
-  <target name="compile-test" depends="jar">
+  <target name="init-test" depends="init">
+    <mkdir dir="${test.build}" />
+
+    <fail message="Missing ${testng.jar}, please download it.">
+      <condition>
+        <not><available file="${testng.jar}" /></not>
+      </condition>
+    </fail>
+  </target>
+
+  <target name="compile-test" depends="init-test, jar">
     <javac srcdir="${test.src}" destdir="${test.build}" classpathref="test.classpath" debug="true" />
   </target>
 

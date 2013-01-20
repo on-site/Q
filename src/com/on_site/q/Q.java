@@ -1,5 +1,6 @@
 package com.on_site.q;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.on_site.frizzle.Frizzle;
 
@@ -391,7 +392,73 @@ public class Q implements Iterable<Element> {
         return $select(get(index));
     }
 
-    // filter()
+    /**
+     * Filter these selected elements down to those that match the
+     * given selector.
+     *
+     * @param selector The selector to filter elements by.
+     * @return A new Q with the filtered elements.
+     */
+    public Q filter(final String selector) {
+        return filter(new Predicate<Element>() {
+            @Override
+            public boolean apply(Element element) {
+                return frizzle().matchesSelector(element, selector);
+            }
+        });
+    }
+
+    /**
+     * Filter these selected elements down to those that pass the
+     * given predicate (ie, the predicate returns true when the
+     * element is passed to apply).
+     *
+     * @param predicate The predicate to filter elements by.
+     * @return A new Q with the filtered elements.
+     */
+    public Q filter(Predicate<Element> predicate) {
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element element : this) {
+            if (predicate.apply(element)) {
+                result.add(element);
+            }
+        }
+
+        return $select(result);
+    }
+
+    /**
+     * Filter these selected elements to just the given element (if it
+     * is included).
+     *
+     * @param element The element to filter down to.
+     * @return A new Q with the filtered elements.
+     */
+    public Q filter(final Element element) {
+        return filter(new Predicate<Element>() {
+            @Override
+            public boolean apply(Element e) {
+                return e == element;
+            }
+        });
+    }
+
+    /**
+     * Filter these selected elements down to those that are included
+     * in the given Q instance.
+     *
+     * @param q A set of elements to filter down to.
+     * @return A new Q with the filtered elements.
+     */
+    public Q filter(final Q q) {
+        return filter(new Predicate<Element>() {
+            @Override
+            public boolean apply(Element element) {
+                return q.asList().contains(element);
+            }
+        });
+    }
 
     /**
      * Find all children of the selected elements that match the given

@@ -2,9 +2,11 @@ package com.on_site.q;
 
 import static com.on_site.q.Q.$;
 
+import com.google.common.base.Predicate;
 import com.on_site.util.TestBase;
 
 import org.testng.annotations.Test;
+import org.w3c.dom.Element;
 
 public class QTraversingTest extends TestBase {
     @Test
@@ -17,6 +19,7 @@ public class QTraversingTest extends TestBase {
         assertEquals($("argle", q.document()).end().size(), 0, "Size");
 
         // Testing other filtering methods to ensure they pop properly
+        assertEquals(q.filter("sub:eq(0)").end(), q, "The resulting Q");
         assertEquals(q.find("sub:eq(0)").end(), q, "The resulting Q");
         assertEquals(q.first().end(), q, "The resulting Q");
         assertEquals(q.last().end(), q, "The resulting Q");
@@ -36,6 +39,45 @@ public class QTraversingTest extends TestBase {
         assertEquals(q.eq(-2).get(0), q.get(0), "Matched element");
         assertEquals(q.eq(-3).size(), 0, "Size");
         assertEquals(q.eq(2).size(), 0, "Size");
+    }
+
+    @Test
+    public void filterSelector() throws Exception {
+        Q q = $("sub, sib", document("<test><sib/><container><sub/><sib/></container><sub>content<sub>More</sub></sub></test>"));
+        assertEquals(q.filter("sib").size(), 2, "Size");
+        assertEquals(q.filter("sib").get(0), q.get(0), "Element");
+        assertEquals(q.filter("sib").get(1), q.get(2), "Element");
+    }
+
+    @Test
+    public void filterPredicate() throws Exception {
+        Q q = $("sub, sib", document("<test><sib/><container><sub/><sib/></container><sub>content<sub>More</sub></sub></test>"));
+
+        Q filtered = q.filter(new Predicate<Element>() {
+            @Override
+            public boolean apply(Element element) {
+                return element.getNodeName().equals("sib");
+            }
+        });
+
+        assertEquals(filtered.size(), 2, "Size");
+        assertEquals(filtered.get(0), q.get(0), "Element");
+        assertEquals(filtered.get(1), q.get(2), "Element");
+    }
+
+    @Test
+    public void filterElement() throws Exception {
+        Q q = $("sub, sib", document("<test><sib/><container><sub/><sib/></container><sub>content<sub>More</sub></sub></test>"));
+        assertEquals(q.filter(q.get(2)).size(), 1, "Size");
+        assertEquals(q.filter(q.get(2)).get(0), q.get(2), "Element");
+    }
+
+    @Test
+    public void filterQ() throws Exception {
+        Q q = $("sub, sib", document("<test><sib/><container><sub/><sib/></container><sub>content<sub>More</sub></sub></test>"));
+        assertEquals(q.filter($("sib", q.document())).size(), 2, "Size");
+        assertEquals(q.filter($("sib", q.document())).get(0), q.get(0), "Element");
+        assertEquals(q.filter($("sib", q.document())).get(1), q.get(2), "Element");
     }
 
     @Test

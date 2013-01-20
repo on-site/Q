@@ -19,6 +19,7 @@ public class Q implements Iterable<Element> {
     private final String selector;
     private final Element[] elements;
     private final Document document;
+    private Q previousQ;
     private Frizzle frizzle;
     private List<Element> list;
 
@@ -187,6 +188,14 @@ public class Q implements Iterable<Element> {
         return new Element[] { element };
     }
 
+    private List<Element> asList() {
+        if (list == null) {
+            list = Arrays.asList(elements);
+        }
+
+        return list;
+    }
+
     private Frizzle frizzle() {
         if (frizzle != null) {
             return frizzle;
@@ -200,12 +209,9 @@ public class Q implements Iterable<Element> {
         return frizzle;
     }
 
-    private List<Element> asList() {
-        if (list == null) {
-            list = Arrays.asList(elements);
-        }
-
-        return list;
+    private Q setPreviousQ(Q previousQ) {
+        this.previousQ = previousQ;
+        return this;
     }
 
     // -------------- Internals --------------
@@ -324,6 +330,97 @@ public class Q implements Iterable<Element> {
         return asList().toArray(new Element[size()]);
     }
 
+    // -------------- Traversing --------------
+
+    // add()
+    // addBack()
+    // andSelf()
+    // children()
+    // closest()
+    // contents()
+
+    /**
+     * End the current stack of filtered elements.  If this is the top
+     * level stack, then what is returned depends on what was
+     * selected.  If nothing was selected, then an empty Q is
+     * returned.  If there is 1 element selected and it is the root
+     * document element, then an empty Q is returned.  Otherwise a Q
+     * with just the document element is returned.
+     *
+     * @return The previous Q instance, a Q with just the document, or
+     * an empty Q.
+     */
+    public Q end() {
+        if (previousQ != null) {
+            return previousQ;
+        }
+
+        if (isEmpty()) {
+            return $(new Element[0], document());
+        }
+
+        if (size() == 1 && get(0) == document().getDocumentElement()) {
+            return $(new Element[0], document());
+        }
+
+        return $(document());
+    }
+
+    /**
+     * Obtain a jQuery object with just the given index selected.
+     *
+     * @param index The index to retrieve... a negative number would
+     * retrieve starting from the end of the list.
+     */
+    public Q eq(int index) {
+        return $(get(index)).setPreviousQ(this);
+    }
+
+    // filter()
+    // find()
+
+    private Q first() {
+        return eq(0);
+    }
+
+    // has()
+    // is()
+    // last()
+    // map()
+    // next()
+    // nextAll()
+    // nextUntil()
+    // not()
+    // offsetParent()
+    // parent()
+    // parents()
+    // parentsUntil()
+    // prev()
+
+    private Q prevAll() {
+        if (isEmpty()) {
+            return $(new Element[0], document()).setPreviousQ(this);
+        }
+
+        // This may need to be reimplemented
+        List<Element> result = new LinkedList<Element>();
+        Element current = get(0);
+
+        while (current.getPreviousSibling() != null) {
+            if (!(current.getPreviousSibling() instanceof Element)) {
+                throw new AssertionError("Expected all previous siblings to be elements!");
+            }
+
+            current = (Element) current.getPreviousSibling();
+            result.add(current);
+        }
+
+        return $(result.toArray(new Element[result.size()]), document()).setPreviousQ(this);
+    }
+
+    // siblings()
+    // slice()
+
     // -------------- Additional utility methods --------------
 
     public boolean isEmpty() {
@@ -341,6 +438,10 @@ public class Q implements Iterable<Element> {
     }
 
     public boolean equals(Object o) {
+        if (o instanceof Q) {
+            return o == this;
+        }
+
         return asList().equals(o);
     }
 
@@ -350,33 +451,4 @@ public class Q implements Iterable<Element> {
 
     // -------------- Uncategorized and untested --------------
     // These are private until they are tested and categorized
-
-    private Q eq(int index) {
-        return $(get(index));
-    }
-
-    private Q first() {
-        return eq(0);
-    }
-
-    private Q prevAll() {
-        if (isEmpty()) {
-            return $(new Element[0], document());
-        }
-
-        // This may need to be reimplemented
-        List<Element> result = new LinkedList<Element>();
-        Element current = get(0);
-
-        while (current.getPreviousSibling() != null) {
-            if (!(current.getPreviousSibling() instanceof Element)) {
-                throw new AssertionError("Expected all previous siblings to be elements!");
-            }
-
-            current = (Element) current.getPreviousSibling();
-            result.add(current);
-        }
-
-        return $(result.toArray(new Element[result.size()]), document());
-    }
 }

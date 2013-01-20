@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * The Q class implements an interface to interact with XML documents,
@@ -411,22 +412,45 @@ public class Q implements Iterable<Element> {
     // parentsUntil()
     // prev()
 
-    private Q prevAll() {
+    /**
+     * Filter the currently selected elements to be just the previous
+     * sibling elements of the first selected element.
+     *
+     * @return A Q of all previous siblings of the first element.
+     */
+    public Q prevAll() {
+        return prevAll(null);
+    }
+
+    /**
+     * Filter the currently selected elements to be just the previous
+     * sibling elements of the first selected element.  Only include
+     * elements that match the given selector (if it is non-null).
+     *
+     * @param selector Selector to filter the returned elements, if
+     * non-null.
+     * @return A Q of all previous siblings of the first element.
+     */
+    public Q prevAll(String selector) {
         if (isEmpty()) {
             return $(new Element[0], document()).setPreviousQ(this);
         }
 
-        // This may need to be reimplemented
         List<Element> result = new LinkedList<Element>();
-        Element current = get(0);
+        Node current = get(0);
 
         while (current.getPreviousSibling() != null) {
-            if (!(current.getPreviousSibling() instanceof Element)) {
-                throw new AssertionError("Expected all previous siblings to be elements!");
+            current = current.getPreviousSibling();
+
+            if (!(current instanceof Element)) {
+                continue;
             }
 
-            current = (Element) current.getPreviousSibling();
-            result.add(current);
+            if (selector != null && !frizzle().matchesSelector((Element) current, selector)) {
+                continue;
+            }
+
+            result.add((Element) current);
         }
 
         return $(result.toArray(new Element[result.size()]), document()).setPreviousQ(this);

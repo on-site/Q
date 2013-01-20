@@ -1,5 +1,6 @@
 package com.on_site.q;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.on_site.frizzle.Frizzle;
@@ -9,6 +10,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -229,6 +231,28 @@ public class Q implements Iterable<Element> {
         return this;
     }
 
+    // -------------- Attributes --------------
+
+    public String attr(String name) {
+        throw new RuntimeException("TODO");
+    }
+
+    public Q attr(String name, String value) {
+        throw new RuntimeException("TODO");
+    }
+
+    public Q attr(Map<String, String> attributes) {
+        throw new RuntimeException("TODO");
+    }
+
+    public Q attr(String name, Function<Element, String> map) {
+        throw new RuntimeException("TODO");
+    }
+
+    public Q removeAttr(String name) {
+        throw new RuntimeException("TODO");
+    }
+
     // -------------- Internals --------------
 
     /**
@@ -239,6 +263,16 @@ public class Q implements Iterable<Element> {
      */
     public Document document() {
         return document;
+    }
+
+    // -------------- Manipulation --------------
+
+    public String xml() {
+        throw new RuntimeException("TODO");
+    }
+
+    public Q xml(String xml) {
+        throw new RuntimeException("TODO");
     }
 
     // -------------- Miscellaneous --------------

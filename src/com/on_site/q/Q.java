@@ -234,7 +234,15 @@ public class Q implements Iterable<Element> {
     // -------------- Attributes --------------
 
     public String attr(String name) {
-        throw new RuntimeException("TODO");
+        if (isEmpty()) {
+            return null;
+        }
+
+        if (!get(0).hasAttribute(name)) {
+            return null;
+        }
+
+        return frizzle().attr(get(0), name);
     }
 
     public Q attr(String name, String value) {

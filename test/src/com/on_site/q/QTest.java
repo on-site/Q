@@ -47,6 +47,15 @@ public class QTest extends TestBase {
         assertNodeName(q.get(1), "sub");
         assertNodeText(q.get(0), "");
         assertNodeText(q.get(1), "content");
+
+        q = $("sub", document("<test><sub>Some <sub>inner content</sub></sub><sub>content</sub></test>"));
+        assertSelectedSize(q, 3);
+        assertNodeName(q.get(0), "sub");
+        assertNodeName(q.get(1), "sub");
+        assertNodeName(q.get(2), "sub");
+        assertNodeText(q.get(0), "Some inner content");
+        assertNodeText(q.get(1), "inner content");
+        assertNodeText(q.get(2), "content");
     }
 
     @Test

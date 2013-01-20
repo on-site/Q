@@ -17,6 +17,7 @@ public class QTraversingTest extends TestBase {
         assertEquals($("argle", q.document()).end().size(), 0, "Size");
 
         // Testing other filtering methods to ensure they pop properly
+        assertEquals(q.find("sub:eq(0)").end(), q, "The resulting Q");
         assertEquals(q.first().end(), q, "The resulting Q");
         assertEquals(q.last().end(), q, "The resulting Q");
         assertEquals(q.prevAll().end(), q, "The resulting Q");
@@ -35,6 +36,35 @@ public class QTraversingTest extends TestBase {
         assertEquals(q.eq(-2).get(0), q.get(0), "Matched element");
         assertEquals(q.eq(-3).size(), 0, "Size");
         assertEquals(q.eq(2).size(), 0, "Size");
+    }
+
+    @Test
+    public void findSelector() throws Exception {
+        Q q = $("sub", document("<test><sub/><sub>content<sub>More</sub></sub></test>"));
+        assertEquals($("test", q.document()).find("sub").size(), 3, "Size");
+        assertEquals($("test", q.document()).find("sub").get(0), q.get(0), "Element");
+        assertEquals($("test", q.document()).find("sub").get(1), q.get(1), "Element");
+        assertEquals($("test", q.document()).find("sub").get(2), q.get(2), "Element");
+        assertEquals($("test", q.document()).find("sub:eq(1)").size(), 1, "Size");
+        assertEquals($("test", q.document()).find("sub:eq(1)").get(0), q.get(1), "Element");
+    }
+
+    @Test
+    public void findQ() throws Exception {
+        Q q = $("sub", document("<test><sib/><container><sub/></container><sub>content<sub>More</sub></sub></test>"));
+        assertEquals($("test", q.document()).find(q).size(), 3, "Size");
+        assertEquals($("test", q.document()).find(q).get(0), q.get(0), "Element");
+        assertEquals($("test", q.document()).find(q).get(1), q.get(1), "Element");
+        assertEquals($("test", q.document()).find(q).get(2), q.get(2), "Element");
+        assertEquals($("test", q.document()).find($("sub:eq(1)", q.document())).size(), 1, "Size");
+        assertEquals($("test", q.document()).find($("sub:eq(1)", q.document())).get(0), q.get(1), "Element");
+        assertEquals($("container", q.document()).find($("sub", q.document())).size(), 1, "Size");
+        assertEquals($("container", q.document()).find($("sub", q.document())).get(0), q.get(0), "Element");
+        assertEquals($("container", q.document()).find($("sub:eq(1)", q.document())).isEmpty(), true, "isEmpty");
+    }
+
+    @Test
+    public void findElement() throws Exception {
     }
 
     @Test

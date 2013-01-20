@@ -4,6 +4,7 @@ import com.google.common.collect.Iterators;
 import com.on_site.frizzle.Frizzle;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -210,6 +211,18 @@ public class Q implements Iterable<Element> {
         return frizzle;
     }
 
+    private Q $select() {
+        return $(new Element[0], document()).setPreviousQ(this);
+    }
+
+    private Q $select(Element element) {
+        return $(element).setPreviousQ(this);
+    }
+
+    private Q $select(Collection<Element> elements) {
+        return $(elements.toArray(new Element[elements.size()]), document()).setPreviousQ(this);
+    }
+
     private Q setPreviousQ(Q previousQ) {
         this.previousQ = previousQ;
         return this;
@@ -372,13 +385,72 @@ public class Q implements Iterable<Element> {
      *
      * @param index The index to retrieve... a negative number would
      * retrieve starting from the end of the list.
+     * @return A new Q with the retrieved element.
      */
     public Q eq(int index) {
-        return $(get(index)).setPreviousQ(this);
+        return $select(get(index));
     }
 
     // filter()
-    // find()
+
+    /**
+     * Find all children of the selected elements that match the given
+     * selector.
+     *
+     * @param selector The selector to find elements of.
+     * @return A new Q with the found elements.
+     */
+    public Q find(String selector) {
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element context : this) {
+            for (Element element : frizzle().select(selector, context)) {
+                result.add(element);
+            }
+        }
+
+        return $select(result);
+    }
+
+    /**
+     * Find all children of the selected elements that are one of the
+     * selected elements in the given q.
+     *
+     * @param q A Q of elements to find in the selected elements.
+     * @return A new Q with the found elements.
+     */
+    public Q find(Q q) {
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element context : this) {
+            for (Element element : q) {
+                if (frizzle.contains(context, element)) {
+                    result.add(element);
+                }
+            }
+        }
+
+        return $select(result);
+    }
+
+    /**
+     * Returns a Q with the given element if it is a child of one of
+     * the selected elements (otherwise an empty Q).
+     *
+     * @param q A Q of elements to find in the selected elements.
+     * @return A new Q with the found elements.
+     */
+    public Q find(Element element) {
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element context : this) {
+            if (frizzle.contains(context, element)) {
+                result.add(element);
+            }
+        }
+
+        return $select(result);
+    }
 
     /**
      * Reduce the selected elements to the first element.
@@ -425,7 +497,7 @@ public class Q implements Iterable<Element> {
      */
     public Q nextAll(String selector) {
         if (isEmpty()) {
-            return $(new Element[0], document()).setPreviousQ(this);
+            return $select();
         }
 
         List<Element> result = new LinkedList<Element>();
@@ -446,7 +518,7 @@ public class Q implements Iterable<Element> {
             }
         }
 
-        return $(result.toArray(new Element[result.size()]), document()).setPreviousQ(this);
+        return $select(result);
     }
 
     // nextUntil()
@@ -478,7 +550,7 @@ public class Q implements Iterable<Element> {
      */
     public Q prevAll(String selector) {
         if (isEmpty()) {
-            return $(new Element[0], document()).setPreviousQ(this);
+            return $select();
         }
 
         List<Element> result = new LinkedList<Element>();
@@ -499,7 +571,7 @@ public class Q implements Iterable<Element> {
             }
         }
 
-        return $(result.toArray(new Element[result.size()]), document()).setPreviousQ(this);
+        return $select(result);
     }
 
     // siblings()

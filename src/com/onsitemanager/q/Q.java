@@ -367,7 +367,7 @@ public class Q implements Iterable<Element> {
     }
 
     /**
-     * Obtain a jQuery object with just the given index selected.
+     * Obtain a Q object with just the given index selected.
      *
      * @param index The index to retrieve... a negative number would
      * retrieve starting from the end of the list.
@@ -379,7 +379,12 @@ public class Q implements Iterable<Element> {
     // filter()
     // find()
 
-    private Q first() {
+    /**
+     * Reduce the selected elements to the first element.
+     *
+     * @return A new Q with just the first item.
+     */
+    public Q first() {
         return eq(0);
     }
 

@@ -1,6 +1,6 @@
-package com.onsitemanager.util;
+package com.on_site.util;
 
-import com.onsitemanager.q.Q;
+import com.on_site.q.Q;
 import com.on_site.util.DOMUtil;
 
 import org.testng.Assert;

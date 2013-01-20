@@ -1,4 +1,4 @@
-package com.onsitemanager.q;
+package com.on_site.q;
 
 import com.google.common.collect.Iterators;
 import com.on_site.frizzle.Frizzle;

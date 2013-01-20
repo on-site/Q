@@ -1,8 +1,8 @@
-package com.onsitemanager.q;
+package com.on_site.q;
 
-import static com.onsitemanager.q.Q.$;
+import static com.on_site.q.Q.$;
 
-import com.onsitemanager.util.TestBase;
+import com.on_site.util.TestBase;
 
 import org.testng.annotations.Test;
 

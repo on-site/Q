@@ -54,6 +54,35 @@ public class QTraversingTest extends TestBase {
     }
 
     @Test
+    public void nextAll() throws Exception {
+        Q q = $("sub", document("<test><sub/><sub>content</sub> sibling content <sub>More content</sub></test>"));
+        assertEquals($("sub:eq(2)", q.document()).nextAll().isEmpty(), true, "isEmpty");
+        assertEquals($("sub:eq(1)", q.document()).nextAll().size(), 1, "Size");
+        assertEquals($("sub:eq(1)", q.document()).nextAll().get(0), q.get(2), "Element");
+        assertEquals($("sub:eq(0)", q.document()).nextAll().size(), 2, "Size");
+        assertEquals($("sub:eq(0)", q.document()).nextAll().get(0), q.get(1), "Element");
+        assertEquals($("sub:eq(0)", q.document()).nextAll().get(1), q.get(2), "Element");
+
+        q = $("sub", document("<test><container1><sub/><sub>content</sub> sibling content <sub>More content</sub></container1>" +
+                              "<container2><sub/><sub>content</sub> sibling content <sub>More content</sub></container2></test>"));
+        assertEquals($("container1 sub:eq(0), container2 sub:eq(1)", q.document()).nextAll().size(), 3, "Size");
+        assertEquals($("container1 sub:eq(0), container2 sub:eq(1)", q.document()).nextAll().get(0), q.get(1), "Element");
+        assertEquals($("container1 sub:eq(0), container2 sub:eq(1)", q.document()).nextAll().get(1), q.get(2), "Element");
+        assertEquals($("container1 sub:eq(0), container2 sub:eq(1)", q.document()).nextAll().get(2), q.get(5), "Element");
+    }
+
+    @Test
+    public void nextAllSelector() throws Exception {
+        Q q = $("sub", document("<test><sub/><sib/><sub>content</sub> sibling content <sub>More content</sub></test>"));
+        assertEquals($("sub:eq(0)", q.document()).nextAll("sub").size(), 2, "Size");
+        assertEquals($("sub:eq(0)", q.document()).nextAll("sub").get(0), q.get(1), "Element");
+        assertEquals($("sub:eq(0)", q.document()).nextAll("sub").get(1), q.get(2), "Element");
+        assertEquals($("sub:eq(0)", q.document()).nextAll("sib").size(), 1, "Size");
+        assertEquals($("sub:eq(0)", q.document()).nextAll("sib").get(0), $("sib", q.document()).get(0), "Element");
+        assertEquals($("sub:eq(0)", q.document()).nextAll("argle").isEmpty(), true, "isEmpty");
+    }
+
+    @Test
     public void prevAll() throws Exception {
         Q q = $("sub", document("<test><sub/><sub>content</sub> sibling content <sub>More content</sub></test>"));
         assertEquals($("sub:eq(0)", q.document()).prevAll().isEmpty(), true, "isEmpty");

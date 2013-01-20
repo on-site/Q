@@ -403,7 +403,52 @@ public class Q implements Iterable<Element> {
 
     // map()
     // next()
-    // nextAll()
+
+    /**
+     * Filter the currently selected elements to be just the next
+     * sibling elements of all the selected elements.
+     *
+     * @return A Q of all next siblings of each selected element.
+     */
+    public Q nextAll() {
+        return nextAll(null);
+    }
+
+    /**
+     * Filter the currently selected elements to be just the next
+     * sibling elements of all the selected elements.  Only include
+     * elements that match the given selector (if it is non-null).
+     *
+     * @param selector Selector to filter the returned elements, if
+     * non-null.
+     * @return A Q of all next siblings of each selected element.
+     */
+    public Q nextAll(String selector) {
+        if (isEmpty()) {
+            return $(new Element[0], document()).setPreviousQ(this);
+        }
+
+        List<Element> result = new LinkedList<Element>();
+
+        for (Node current : this) {
+            while (current.getNextSibling() != null) {
+                current = current.getNextSibling();
+
+                if (!(current instanceof Element)) {
+                    continue;
+                }
+
+                if (selector != null && !frizzle().matchesSelector((Element) current, selector)) {
+                    continue;
+                }
+
+                result.add((Element) current);
+            }
+        }
+
+        return $(result.toArray(new Element[result.size()]), document()).setPreviousQ(this);
+    }
+
     // nextUntil()
     // not()
     // offsetParent()

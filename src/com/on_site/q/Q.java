@@ -233,6 +233,15 @@ public class Q implements Iterable<Element> {
 
     // -------------- Attributes --------------
 
+    /**
+     * Retrieve the value of the given attribute name for the first
+     * selected element.  Returns null if there are no selected
+     * elements, or if the first element doesn't have the given
+     * attribute.
+     *
+     * @param name The name of the attribute to retrieve.
+     * @return The retrieved attribute value.
+     */
     public String attr(String name) {
         if (isEmpty()) {
             return null;
@@ -245,20 +254,69 @@ public class Q implements Iterable<Element> {
         return frizzle().attr(get(0), name);
     }
 
+    /**
+     * Set the attribute to the given value with the given name for
+     * all selected elements.
+     *
+     * @param name The name of the attribute to set.
+     * @param value The new value of the attribute.
+     * @return This Q.
+     */
     public Q attr(String name, String value) {
-        throw new RuntimeException("TODO");
+        if (!isEmpty()) {
+            for (Element element : this) {
+                element.setAttribute(name, value);
+            }
+        }
+
+        return this;
     }
 
+    /**
+     * For each key/value pair of the given map, set the attribute
+     * with the key value as the name to the value of the key/value
+     * pair, for all selected elements.
+     *
+     * @param attributes A hash of attribute name/value pairs to set.
+     * @return This Q.
+     */
     public Q attr(Map<String, String> attributes) {
-        throw new RuntimeException("TODO");
+        for (Map.Entry<String, String> entry : attributes.entrySet()) {
+            attr(entry.getKey(), entry.getValue());
+        }
+
+        return this;
     }
 
+    /**
+     * Set the attribute to the value returned from the map function
+     * for each selected element for the given attribute name.
+     *
+     * @param name The name of the attribute to set.
+     * @param map A mapping function of element to attribute value.
+     * @return This Q.
+     */
     public Q attr(String name, Function<Element, String> map) {
-        throw new RuntimeException("TODO");
+        for (Element element : this) {
+            element.setAttribute(name, map.apply(element));
+        }
+
+        return this;
     }
 
+    /**
+     * Remove the attribute with the given name from all selected
+     * elements.
+     *
+     * @param name The name of the attribute to remove.
+     * @return This Q.
+     */
     public Q removeAttr(String name) {
-        throw new RuntimeException("TODO");
+        for (Element element : this) {
+            element.removeAttribute(name);
+        }
+
+        return this;
     }
 
     // -------------- Internals --------------

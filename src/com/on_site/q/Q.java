@@ -428,6 +428,10 @@ public class Q implements Iterable<Element> {
      * returned from applying the given map function with the element.
      * The current Q is returned.
      *
+     * Note that the element is not cleared until after the xml string
+     * has been returned (so you may inspect the xml contents within
+     * the function).
+     *
      * @param map A mapping function of element to xml string.
      * @return This Q.
      * @throws XmlException If there is a problem parsing the xml or

@@ -423,8 +423,40 @@ public class Q implements Iterable<Element> {
         return this;
     }
 
+    /**
+     * Set the content of each selected element to be the xml string
+     * returned from applying the given map function with the element.
+     * The current Q is returned.
+     *
+     * @param map A mapping function of element to xml string.
+     * @return This Q.
+     * @throws XmlException If there is a problem parsing the xml or
+     * inserting it into each element.
+     */
     public Q xml(Function<Element, String> map) throws XmlException {
-        throw new RuntimeException("TODO");
+        try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
+            for (Element element : this) {
+                String xml = map.apply(element);
+                Document document = builder.parse(new InputSource(new StringReader("<root>" + xml + "</root>")));
+                NodeList nodes = document.getDocumentElement().getChildNodes();
+                element.setTextContent("");
+
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    Node node = document().importNode(nodes.item(i), true);
+                    element.appendChild(node);
+                }
+            }
+        } catch (IOException e) {
+            throw new XmlException(e);
+        } catch (ParserConfigurationException e) {
+            throw new XmlException(e);
+        } catch (SAXException e) {
+            throw new XmlException(e);
+        }
+
+        return this;
     }
 
     // -------------- Miscellaneous --------------

@@ -5,6 +5,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.on_site.frizzle.Frizzle;
 
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -12,9 +13,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * The Q class implements an interface to interact with XML documents,
@@ -333,8 +342,43 @@ public class Q implements Iterable<Element> {
 
     // -------------- Manipulation --------------
 
-    public String xml() {
-        throw new RuntimeException("TODO");
+    /**
+     * Retrieve the xml for the first selected element as a string
+     * (just the content, not including the element itself).  If there
+     * are no elements selected, this returns null.  If the element
+     * has no children (even if it is a singular element like
+     * &lt;example/&gt;), an empty string is returned.
+     *
+     * @return The content of the first selected element.
+     * @throws XmlException If there is a problem transforming the
+     * nested xml as a string.
+     */
+    public String xml() throws XmlException {
+        if (isEmpty()) {
+            return null;
+        }
+
+        NodeList nodes = get(0).getChildNodes();
+
+        if (nodes.getLength() == 0) {
+            return "";
+        }
+
+        try {
+            TransformerFactory transFactory = TransformerFactory.newInstance();
+            Transformer transformer = transFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            StringWriter result = new StringWriter();
+            StreamResult output = new StreamResult(result);
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                transformer.transform(new DOMSource(nodes.item(i)), output);
+            }
+
+            return result.toString();
+        } catch (TransformerException e) {
+            throw new XmlException(e);
+        }
     }
 
     public Q xml(String xml) {

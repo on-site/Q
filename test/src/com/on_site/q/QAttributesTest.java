@@ -67,4 +67,10 @@ public class QAttributesTest extends TestBase {
         assertEquals(q.eq(0).attr("foo"), null, "Attribute value");
         assertEquals(q.eq(1).attr("foo"), null, "Attribute value");
     }
+
+    @Test
+    public void attrNameValueWithInvalidAttributes() throws Exception {
+        // TODO
+        // Make sure setting attribute values that are invalid for XML will auto be escaped.
+    }
 }

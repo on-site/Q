@@ -5,6 +5,8 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.on_site.frizzle.Frizzle;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,6 +15,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -24,6 +29,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * The Q class implements an interface to interact with XML documents,
@@ -365,8 +372,8 @@ public class Q implements Iterable<Element> {
         }
 
         try {
-            TransformerFactory transFactory = TransformerFactory.newInstance();
-            Transformer transformer = transFactory.newTransformer();
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer transformer = factory.newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             StringWriter result = new StringWriter();
             StreamResult output = new StreamResult(result);
@@ -381,7 +388,42 @@ public class Q implements Iterable<Element> {
         }
     }
 
-    public Q xml(String xml) {
+    /**
+     * Set the content of each selected element to be the given xml
+     * string.  The current Q is returned.
+     *
+     * @param xml The xml to set as the content for all selected
+     * elements.
+     * @return This Q.
+     * @throws XmlException If there is a problem parsing the xml or
+     * inserting it into each element.
+     */
+    public Q xml(String xml) throws XmlException {
+        try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document document = builder.parse(new InputSource(new StringReader("<root>" + xml + "</root>")));
+            NodeList nodes = document.getDocumentElement().getChildNodes();
+
+            for (Element element : this) {
+                element.setTextContent("");
+
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    Node node = document().importNode(nodes.item(i), true);
+                    element.appendChild(node);
+                }
+            }
+        } catch (IOException e) {
+            throw new XmlException(e);
+        } catch (ParserConfigurationException e) {
+            throw new XmlException(e);
+        } catch (SAXException e) {
+            throw new XmlException(e);
+        }
+
+        return this;
+    }
+
+    public Q xml(Function<Element, String> map) throws XmlException {
         throw new RuntimeException("TODO");
     }
 

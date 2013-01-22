@@ -18,5 +18,14 @@ public class QManipulationTest extends TestBase {
 
     @Test
     public void xmlXml() throws Exception {
+        Q q = $("sub", document("<test><sub>Content <b>with some</b> sub content. <endingTag value=\"something\"/></sub><sub>content</sub><sub /></test>"));
+        q.xml("this <b>is</b> a test<br id=\"123\"/> of xml<br/>");
+        assertEquals($("sub:eq(0)", q.document()).xml(), "this <b>is</b> a test<br id=\"123\"/> of xml<br/>", "XML");
+        assertEquals($("sub:eq(1)", q.document()).xml(), "this <b>is</b> a test<br id=\"123\"/> of xml<br/>", "XML");
+        assertEquals($("sub:eq(2)", q.document()).xml(), "this <b>is</b> a test<br id=\"123\"/> of xml<br/>", "XML");
+    }
+
+    @Test
+    public void xmlMap() throws Exception {
     }
 }

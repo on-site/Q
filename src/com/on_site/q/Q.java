@@ -3,6 +3,8 @@ package com.on_site.q;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
 import com.on_site.frizzle.Frizzle;
@@ -27,7 +29,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -59,8 +60,7 @@ public class Q implements Iterable<Element> {
     private final Document document;
     private Q previousQ;
     private Frizzle frizzle;
-    private List<Element> list;
-    private Set<Element> set;
+    private ImmutableList<Element> list;
 
     // -------------- Constructors --------------
 
@@ -274,12 +274,12 @@ public class Q implements Iterable<Element> {
             }
         }
 
-        this.elements = result.toArray(new Element[result.size()]);
+        this.elements = unique(result.toArray(new Element[result.size()]));
     }
 
     private Q(String selector, Element[] elements, Document document) {
         this.selector = selector;
-        this.elements = elements;
+        this.elements = unique(elements);
 
         if (document == null && elements.length > 0) {
             this.document = elements[0].getOwnerDocument();
@@ -436,20 +436,16 @@ public class Q implements Iterable<Element> {
         return new Element[] { element };
     }
 
-    private List<Element> asList() {
+    private ImmutableList<Element> asList() {
         if (list == null) {
-            list = Arrays.asList(elements);
+            list = ImmutableList.<Element>builder().add(elements).build();
         }
 
         return list;
     }
 
-    private Set<Element> asSet() {
-        if (set == null) {
-            set = Sets.newHashSet(elements);
-        }
-
-        return set;
+    private ImmutableSet<Element> asSet() {
+        return ImmutableSet.<Element>builder().add(elements).build();
     }
 
     private Frizzle frizzle() {
@@ -518,6 +514,16 @@ public class Q implements Iterable<Element> {
     private Q setPreviousQ(Q previousQ) {
         this.previousQ = previousQ;
         return this;
+    }
+
+    /**
+     * This should ONLY be called for the constructor, as it sets the
+     * list view of the instance elements array.
+     */
+    private Element[] unique(Element[] elements) {
+        ImmutableSet<Element> set = ImmutableSet.<Element>builder().add(elements).build();
+        list = ImmutableList.<Element>builder().addAll(set).build();
+        return list.toArray(new Element[list.size()]);
     }
 
     // -------------- Attributes --------------
@@ -1064,7 +1070,7 @@ public class Q implements Iterable<Element> {
      * @return Whether the element is in this Q.
      */
     public boolean is(Element element) {
-        return asSet().contains(element);
+        return asList().contains(element);
     }
 
     /**

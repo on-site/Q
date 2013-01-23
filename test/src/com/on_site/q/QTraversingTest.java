@@ -230,6 +230,7 @@ public class QTraversingTest extends TestBase {
         assertEquals(q.parent().size(), 2, "Size");
         assertEquals(q.parent().get(0), $("outer1", q.document()).get(0), "Element");
         assertEquals(q.parent().get(1), $("outer2", q.document()).get(0), "Element");
+        assertEquals($("sib, sibling", q.document()).parent().size(), 1, "Size");
         assertEquals($("test", q.document()).parent().isEmpty(), true, "isEmpty");
     }
 

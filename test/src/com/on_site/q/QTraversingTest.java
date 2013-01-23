@@ -222,6 +222,40 @@ public class QTraversingTest extends TestBase {
     }
 
     @Test
+    public void parent() throws Exception {
+        Q q = $("inner", $("<test>" +
+                           "  <container1><outer1><inner/></outer1></container1>" +
+                           "  <container2><outer2>Some<sib/> <inner/> content with <sibling/></outer2></container2>" +
+                           "</test>"));
+        assertEquals(q.parent().size(), 2, "Size");
+        assertEquals(q.parent().get(0), $("outer1", q.document()).get(0), "Element");
+        assertEquals(q.parent().get(1), $("outer2", q.document()).get(0), "Element");
+        assertEquals($("test", q.document()).parent().isEmpty(), true, "isEmpty");
+    }
+
+    @Test
+    public void parentSelector() throws Exception {
+        Q q = $("inner", $("<test>" +
+                           "  <container1><outer1><inner/></outer1></container1>" +
+                           "  <container2><outer2>Some<sib/> <inner/> content with <sibling/></outer2></container2>" +
+                           "</test>"));
+        assertEquals(q.parent("outer1").size(), 1, "Size");
+        assertEquals(q.parent("outer1").get(0), $("outer1", q.document()).get(0), "Element");
+        assertEquals(q.parent("outer2").size(), 1, "Size");
+        assertEquals(q.parent("outer2").get(0), $("outer2", q.document()).get(0), "Element");
+        assertEquals(q.parent("test").isEmpty(), true, "isEmpty");
+        assertEquals($("test", q.document()).parent("*").isEmpty(), true, "isEmpty");
+    }
+
+    @Test
+    public void parents() throws Exception {
+    }
+
+    @Test
+    public void parentsSelector() throws Exception {
+    }
+
+    @Test
     public void prev() throws Exception {
         Q q = $("sub", document("<test><sub/><sub>content</sub> sibling content <sub>More content</sub></test>"));
         assertEquals($("sub:eq(0)", q.document()).prev().isEmpty(), true, "isEmpty");

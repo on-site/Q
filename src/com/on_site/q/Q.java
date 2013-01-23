@@ -1174,8 +1174,60 @@ public class Q implements Iterable<Element> {
     // nextUntil()
     // not()
     // offsetParent()
-    // parent()
-    // parents()
+
+    /**
+     * Obtain a Q of all the parent elements of the selected elements.
+     *
+     * @return A Q with the parents of the selected elements.
+     */
+    public Q parent() {
+        return this.parent(null);
+    }
+
+    /**
+     * Obtain a Q of all the parent elements of the selected elements,
+     * filtered by the given selector (if it is non-null).
+     *
+     * @param selector The selector to filter the results with, if
+     * non-null.
+     * @return A Q with the filtered parents of the selected elements.
+     */
+    public Q parent(String selector) {
+        if (isEmpty()) {
+            return $select();
+        }
+
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element element : this) {
+            Node parent = element.getParentNode();
+
+            if (parent == null) {
+                continue;
+            }
+
+            if (!(parent instanceof Element)) {
+                continue;
+            }
+
+            if (selector != null && !frizzle().matchesSelector((Element) parent, selector)) {
+                continue;
+            }
+
+            result.add((Element) parent);
+        }
+
+        return $select(result);
+    }
+
+    public Q parents() {
+        throw new RuntimeException("TODO");
+    }
+
+    public Q parents(String selector) {
+        throw new RuntimeException("TODO");
+    }
+
     // parentsUntil()
 
     /**
@@ -1390,7 +1442,4 @@ public class Q implements Iterable<Element> {
         nodesToWriterOrStream(new SingleNodeList(document().getDocumentElement()), writer, null);
         return this;
     }
-
-    // -------------- Uncategorized and untested --------------
-    // These are private until they are tested and categorized
 }

@@ -629,6 +629,61 @@ public class Q implements Iterable<Element> {
     // -------------- Manipulation --------------
 
     /**
+     * Retrieve the text for the first selected element as a string.
+     * The text will not include any xml nodes.  If there are no
+     * elements selected, null is returned.  If the element has no
+     * children (even if it is a singular element like
+     * &lt;example/&gt;), an empty string is returned.
+     *
+     * Note that this method differs from jQuery in that it only
+     * returns the first selected element's text, rather than all
+     * selected elements concatenated together.
+     *
+     * @return The text of the first selected node.
+     */
+    public String text() {
+        if (isEmpty()) {
+            return null;
+        }
+
+        return get(0).getTextContent();
+    }
+
+    /**
+     * Set the text of all selected elements to the given text.
+     *
+     * @param text The text to set.
+     * @return This Q.
+     */
+    public Q text(String text) {
+        for (Element element : this) {
+            element.setTextContent(text);
+        }
+
+        return this;
+    }
+
+    /**
+     * Set the text of each selected element to be the text returned
+     * from applying the given map function with the element.  The
+     * current Q is returned.
+     *
+     * Note that the element is not cleared until after the text has
+     * been returned (so you may inspect the xml/text contents within
+     * the function).
+     *
+     * @param map a mapping function of element to text.
+     * @return This Q.
+     */
+    public Q text(Function<Element, String> map) {
+        for (Element element : this) {
+            element.setTextContent(map.apply(element));
+        }
+
+        return this;
+    }
+
+    /**
      * Retrieve the xml for the first selected element as a string
      * (just the content, not including the element itself).  If there
      * are no elements selected, this returns null.  If the element

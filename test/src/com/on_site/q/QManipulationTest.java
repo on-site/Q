@@ -10,6 +10,44 @@ import org.w3c.dom.Element;
 
 public class QManipulationTest extends TestBase {
     @Test
+    public void text() throws Exception {
+        Q q = $("sub", $("<test><sub>Content <b>with some</b> sub content. <endingTag value=\"something\"/></sub><sub>content</sub><sub /></test>"));
+        assertEquals(q.text(), "Content with some sub content. ", "Text");
+        assertEquals($("sub:eq(2)", q.document()).text(), "", "Text");
+        assertEquals($("nothing", q.document()).text(), null, "Text");
+    }
+
+    @Test
+    public void textText() throws Exception {
+        Q q = $("sub", $("<test><sub>Content <b>with some</b> sub content. <endingTag value=\"something\"/></sub><sub>content</sub><sub /></test>"));
+        q.text("this is a test of text");
+        assertEquals($("sub:eq(0)", q.document()).text(), "this is a test of text", "Text");
+        assertEquals($("sub:eq(1)", q.document()).text(), "this is a test of text", "Text");
+        assertEquals($("sub:eq(2)", q.document()).text(), "this is a test of text", "Text");
+    }
+
+    @Test
+    public void textMap() throws Exception {
+        Q q = $("sub", document("<test><sub>Content <b>with some</b> sub content. <endingTag value=\"something\"/></sub><sub>content</sub><sub /></test>"));
+        final int[] i = new int[] { 0 };
+        q.text(new Function<Element, String>() {
+            @Override
+            public String apply(Element element) {
+                int n = i[0]++;
+                return "this is test " + n + " of text";
+            }
+        });
+        assertEquals($("sub:eq(0)", q.document()).text(), "this is test 0 of text", "Text");
+        assertEquals($("sub:eq(1)", q.document()).text(), "this is test 1 of text", "Text");
+        assertEquals($("sub:eq(2)", q.document()).text(), "this is test 2 of text", "Text");
+    }
+
+    @Test
+    public void textTextWithXmlCharacters() throws Exception {
+        // TODO
+    }
+
+    @Test
     public void xml() throws Exception {
         Q q = $("sub", document("<test><sub>Content <b>with some</b> sub content. <endingTag value=\"something\"/></sub><sub>content</sub><sub /></test>"));
         assertEquals(q.xml(), "Content <b>with some</b> sub content. <endingTag value=\"something\"/>", "XML");

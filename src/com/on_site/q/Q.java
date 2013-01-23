@@ -3,6 +3,7 @@ package com.on_site.q;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
+import com.google.common.io.Closeables;
 import com.on_site.frizzle.Frizzle;
 import com.on_site.util.DOMUtil;
 import com.on_site.util.SingleNodeList;
@@ -287,18 +288,34 @@ public class Q implements Iterable<Element> {
     }
 
     private String nodesToString(NodeList nodes) throws XmlException {
+        StringWriter result = new StringWriter();
+
+        try {
+            nodesToWriterOrStream(nodes, result, null);
+            return result.toString();
+        } finally {
+            Closeables.closeQuietly(result);
+        }
+    }
+
+    private void nodesToWriterOrStream(NodeList nodes, Writer writer, OutputStream stream) throws XmlException {
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer transformer = factory.newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            StringWriter result = new StringWriter();
-            StreamResult output = new StreamResult(result);
+            StreamResult output = null;
+
+            if (writer != null) {
+                output = new StreamResult(writer);
+            } else if (stream != null) {
+                output = new StreamResult(stream);
+            } else {
+                throw new NullPointerException("One of a writer or stream is required!");
+            }
 
             for (int i = 0; i < nodes.getLength(); i++) {
                 transformer.transform(new DOMSource(nodes.item(i)), output);
             }
-
-            return result.toString();
         } catch (TransformerException e) {
             throw new XmlException(e);
         }
@@ -971,14 +988,45 @@ public class Q implements Iterable<Element> {
     }
 
     public Q write(File file) {
+        // TODO
         return this;
     }
 
-    public Q write(OutputStream outputStream) {
+    /**
+     * Write the entire document selected from this Q to the given
+     * outputStream.  If there is no document associated with it, then
+     * this method immediately returns this without doing anything
+     * (which can happen if $() is called).
+     *
+     * @param outputStream The stream to write the xml to.
+     * @return This Q.
+     * @throws XmlException If there is a problem transforming xml.
+     */
+    public Q write(OutputStream outputStream) throws XmlException {
+        if (document() == null) {
+            return this;
+        }
+
+        nodesToWriterOrStream(new SingleNodeList(document().getDocumentElement()), null, outputStream);
         return this;
     }
 
-    public Q write(Writer writer) {
+    /**
+     * Write the entire document selected from this Q to the given
+     * writer.  If there is no document associated with it, then this
+     * method immediately returns this without doing anything (which
+     * can happen if $() is called).
+     *
+     * @param writer The writer to write the xml to.
+     * @return This Q.
+     * @throws XmlException If there is a problem transforming xml.
+     */
+    public Q write(Writer writer) throws XmlException {
+        if (document() == null) {
+            return this;
+        }
+
+        nodesToWriterOrStream(new SingleNodeList(document().getDocumentElement()), writer, null);
         return this;
     }
 

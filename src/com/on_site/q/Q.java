@@ -9,6 +9,7 @@ import com.on_site.util.DOMUtil;
 import com.on_site.util.SingleNodeList;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
@@ -987,9 +988,34 @@ public class Q implements Iterable<Element> {
         return nodesToString(new SingleNodeList(document().getDocumentElement()));
     }
 
-    public Q write(File file) {
-        // TODO
-        return this;
+    /**
+     * Write the entire document selected from this Q to the given
+     * file.  If there is no document associated with it, then this
+     * method immediately returns this without doing anything (which
+     * can happen if $() is called).
+     *
+     * @param file The file to write the xml to.
+     * @return This Q.
+     * @throws XmlException If there is a problem transforming xml or
+     * writing to the file.
+     */
+    public Q write(File file) throws XmlException {
+        if (document() == null) {
+            return this;
+        }
+
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+
+            try {
+                nodesToWriterOrStream(new SingleNodeList(document().getDocumentElement()), null, out);
+                return this;
+            } finally {
+                out.close();
+            }
+        } catch (IOException e) {
+            throw new XmlException("There was a problem while writing to the file.", e);
+        }
     }
 
     /**

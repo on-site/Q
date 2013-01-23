@@ -3,6 +3,8 @@ package com.on_site.util;
 import com.on_site.q.Q;
 import com.on_site.util.DOMUtil;
 
+import java.io.File;
+
 import org.testng.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -31,5 +33,11 @@ public class TestBase extends Assert {
 
     public static void assertNodeText(Node node, String expected) {
         assertEquals(node.getTextContent(), expected, "Node text");
+    }
+
+    public static File tempFile() throws Exception {
+        File temp = File.createTempFile("q_test", ".xml");
+        temp.deleteOnExit();
+        return temp;
     }
 }

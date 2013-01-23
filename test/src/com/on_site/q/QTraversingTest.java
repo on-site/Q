@@ -121,6 +121,45 @@ public class QTraversingTest extends TestBase {
     }
 
     @Test
+    public void isSelector() throws Exception {
+        Q q = $("sub", document("<test><sub/><sub>content</sub></test>"));
+        assertEquals(q.is("sub"), true, "Is sub");
+        assertEquals(q.is("sib"), false, "Is sib");
+    }
+
+    @Test
+    public void isPredicate() throws Exception {
+        Q q = $("sub", document("<test><sub/><sub>content</sub></test>"));
+        assertEquals(q.is(new Predicate<Element>() {
+            @Override
+            public boolean apply(Element element) {
+                return true;
+            }
+        }), true, "Is true");
+        assertEquals(q.is(new Predicate<Element>() {
+            @Override
+            public boolean apply(Element element) {
+                return false;
+            }
+        }), false, "Is false");
+    }
+
+    @Test
+    public void isQ() throws Exception {
+        Q q = $("sub", document("<test><sub/><sub>content</sub></test>"));
+        assertEquals(q.is(q), true, "Is sub");
+        assertEquals(q.is($("sub:eq(1)", q.document())), true, "Is sub");
+        assertEquals(q.is($("test", q.document())), false, "Is test");
+    }
+
+    @Test
+    public void isElement() throws Exception {
+        Q q = $("sub", document("<test><sub/><sub>content</sub></test>"));
+        assertEquals(q.is(q.get(0)), true, "Is sub");
+        assertEquals(q.is($("test", q.document()).get(0)), false, "Is test");
+    }
+
+    @Test
     public void last() throws Exception {
         Q q = $("sub", document("<test><sub/><sub>content</sub></test>"));
         assertEquals(q.last().size(), 1, "Size");

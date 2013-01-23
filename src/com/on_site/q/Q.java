@@ -3,6 +3,7 @@ package com.on_site.q;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
 import com.on_site.frizzle.Frizzle;
 import com.on_site.util.DOMUtil;
@@ -26,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -58,6 +60,7 @@ public class Q implements Iterable<Element> {
     private Q previousQ;
     private Frizzle frizzle;
     private List<Element> list;
+    private Set<Element> set;
 
     // -------------- Constructors --------------
 
@@ -439,6 +442,14 @@ public class Q implements Iterable<Element> {
         }
 
         return list;
+    }
+
+    private Set<Element> asSet() {
+        if (set == null) {
+            set = Sets.newHashSet(elements);
+        }
+
+        return set;
     }
 
     private Frizzle frizzle() {
@@ -999,7 +1010,62 @@ public class Q implements Iterable<Element> {
     }
 
     // has()
-    // is()
+
+    /**
+     * Determine if the given selector applies for any selected
+     * element.
+     *
+     * @param selector The selector to test each element with.
+     * @return True if the selector applies to any selected element.
+     */
+    public boolean is(String selector) {
+        for (Element element : this) {
+            if (frizzle().matchesSelector(element, selector)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Invoke the predicate for each element.  If it returns true for
+     * any, return true, otherwise false.
+     *
+     * @param predicate The predicate to test against each element.
+     * @return Whether the predicate returns true for any element.
+     */
+    public boolean is(Predicate<Element> predicate) {
+        for (Element element : this) {
+            if (predicate.apply(element)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if any element in the given q is contained inside
+     * this Q.
+     *
+     * @param q A set of elements to check if they are contained in
+     * this Q.
+     * @return Whether an element in q is in this Q.
+     */
+    public boolean is(Q q) {
+        return !Sets.intersection(asSet(), q.asSet()).isEmpty();
+    }
+
+    /**
+     * Determine if the given element is contained inside this Q.
+     *
+     * @param element The element to check if it is contained.
+     * @return Whether the element is in this Q.
+     */
+    public boolean is(Element element) {
+        return asSet().contains(element);
+    }
 
     /**
      * Reduce the selected elements to the last element.

@@ -4,10 +4,14 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.on_site.frizzle.Frizzle;
+import com.on_site.util.DOMUtil;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -51,6 +55,41 @@ public class Q implements Iterable<Element> {
      */
     public Q() {
         this("", new Element[0], null);
+    }
+
+    /**
+     * Construct with a string of xml.  If the xml does not have a
+     * root node, then a &lt;root&gt; node will be wrapped around the
+     * entire xml content, and all immediate children of the inserted
+     * root will be selected (if there are any, otherwise it will be
+     * an empty set of selected elements).
+     *
+     * @param xml The xml to parse.
+     */
+    public Q(String xml) {
+        this.selector = "";
+        Document document = null;
+        boolean addedRoot = false;
+
+        // TODO: Try to inhibit error messages about content not being
+        // allowed in the prolog (when there is no root node)
+        try {
+            document = DOMUtil.documentFromString(xml);
+        } catch (Exception e) {
+            // Assume the error was missing root node and try
+            // again... there isn't a typed exception so we KNOW it is
+            // because of a missing root node.
+            document = DOMUtil.documentFromString("<root>" + xml + "</root>");
+            addedRoot = true;
+        }
+
+        this.document = document;
+
+        if (addedRoot) {
+            this.elements = frizzle().select(":root > *");
+        } else {
+            this.elements = new Element[] { document.getDocumentElement() };
+        }
     }
 
     /**
@@ -139,6 +178,20 @@ public class Q implements Iterable<Element> {
      */
     public static Q $() {
         return new Q();
+    }
+
+    /**
+     * Parse a string of xml.  If the xml does not have a root node,
+     * then a &lt;root&gt; node will be wrapped around the entire xml
+     * content, and all immediate children of the inserted root will
+     * be selected (if there are any, otherwise it will be an empty
+     * set of selected elements).
+     *
+     * @param xml The xml to parse.
+     * @return A Q with the parsed root element(s) selected.
+     */
+    public static Q $(String xml) {
+        return new Q(xml);
     }
 
     /**
@@ -866,7 +919,19 @@ public class Q implements Iterable<Element> {
     // siblings()
     // slice()
 
-    // -------------- Additional utility methods --------------
+    // -------------- Additional utility methods not defined by jQuery --------------
+
+    public boolean equals(Object o) {
+        if (o instanceof Q) {
+            return o == this;
+        }
+
+        return asList().equals(o);
+    }
+
+    public int hashCode() {
+        return asList().hashCode();
+    }
 
     public boolean isEmpty() {
         return size() == 0;
@@ -882,16 +947,20 @@ public class Q implements Iterable<Element> {
         return Iterators.forArray(elements);
     }
 
-    public boolean equals(Object o) {
-        if (o instanceof Q) {
-            return o == this;
-        }
-
-        return asList().equals(o);
+    public String write() {
+        return null;
     }
 
-    public int hashCode() {
-        return asList().hashCode();
+    public Q write(File file) {
+        return this;
+    }
+
+    public Q write(OutputStream outputStream) {
+        return this;
+    }
+
+    public Q write(Writer writer) {
+        return this;
     }
 
     // -------------- Uncategorized and untested --------------

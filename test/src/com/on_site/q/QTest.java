@@ -75,4 +75,31 @@ public class QTest extends TestBase {
         assertNodeName(q.get(0), "sub");
         assertNodeText(q.get(0), "nested");
     }
+
+    @Test
+    public void xmlQConstructor() throws Exception {
+        Q q = $("<test><sub /><sub>content</sub></test>");
+        assertSelectedSize(q, 1);
+        assertNodeName(q.get(0), "test");
+
+        q = $("This <sub />is <child>some <sub />content</child> that is technically invalid xml.");
+        assertSelectedSize(q, 2);
+        assertNodeName(q.get(0), "sub");
+        assertNodeName(q.get(1), "child");
+        assertNodeText(q.get(1), "some content");
+        assertNodeName(q.get(0).getParentNode(), "root");
+        assertNodeText(q.get(0).getParentNode(), "This is some content that is technically invalid xml.");
+    }
+
+    public void xmlFileQConstructor() throws Exception {
+        // TODO
+    }
+
+    public void xmlInputStreamQConstructor() throws Exception {
+        // TODO
+    }
+
+    public void xmlReaderQConstructor() throws Exception {
+        // TODO
+    }
 }

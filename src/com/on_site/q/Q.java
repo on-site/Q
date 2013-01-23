@@ -5,6 +5,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.on_site.frizzle.Frizzle;
 import com.on_site.util.DOMUtil;
+import com.on_site.util.SingleNodeList;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +40,8 @@ import org.xml.sax.SAXException;
 /**
  * The Q class implements an interface to interact with XML documents,
  * allowing easy manipulation and querying.
+ *
+ * @author Mike Virata-Stone
  */
 public class Q implements Iterable<Element> {
     private final String selector;
@@ -283,6 +286,24 @@ public class Q implements Iterable<Element> {
         return frizzle;
     }
 
+    private String nodesToString(NodeList nodes) throws XmlException {
+        try {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer transformer = factory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            StringWriter result = new StringWriter();
+            StreamResult output = new StreamResult(result);
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                transformer.transform(new DOMSource(nodes.item(i)), output);
+            }
+
+            return result.toString();
+        } catch (TransformerException e) {
+            throw new XmlException(e);
+        }
+    }
+
     private Q $select() {
         return $(new Element[0], document()).setPreviousQ(this);
     }
@@ -424,21 +445,7 @@ public class Q implements Iterable<Element> {
             return "";
         }
 
-        try {
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer transformer = factory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            StringWriter result = new StringWriter();
-            StreamResult output = new StreamResult(result);
-
-            for (int i = 0; i < nodes.getLength(); i++) {
-                transformer.transform(new DOMSource(nodes.item(i)), output);
-            }
-
-            return result.toString();
-        } catch (TransformerException e) {
-            throw new XmlException(e);
-        }
+        return nodesToString(nodes);
     }
 
     /**
@@ -947,8 +954,20 @@ public class Q implements Iterable<Element> {
         return Iterators.forArray(elements);
     }
 
-    public String write() {
-        return null;
+    /**
+     * Return the entire document selected from this Q written to a
+     * string.  If there is no document associated with it, then null
+     * is returned (which can happen if $() is called).
+     *
+     * @return The entire document as a string.
+     * @throws XmlException If there is a problem transforming xml.
+     */
+    public String write() throws XmlException {
+        if (document() == null) {
+            return null;
+        }
+
+        return nodesToString(new SingleNodeList(document().getDocumentElement()));
     }
 
     public Q write(File file) {

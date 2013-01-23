@@ -6,12 +6,17 @@ import com.google.common.collect.Iterators;
 import com.google.common.io.Closeables;
 import com.on_site.frizzle.Frizzle;
 import com.on_site.util.DOMUtil;
+import com.on_site.util.IOUtil;
 import com.on_site.util.SingleNodeList;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -36,6 +41,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.ls.LSException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -70,30 +76,135 @@ public class Q implements Iterable<Element> {
      * an empty set of selected elements).
      *
      * @param xml The xml to parse.
+     * @throws XmlException If there is a problem reading.
      */
-    public Q(String xml) {
-        this.selector = "";
-        Document document = null;
-        boolean addedRoot = false;
+    public Q(String xml) throws XmlException {
+        this(null, new StringReader(xml), null, true);
+    }
 
-        // TODO: Try to inhibit error messages about content not being
-        // allowed in the prolog (when there is no root node)
-        try {
-            document = DOMUtil.documentFromString(xml);
-        } catch (Exception e) {
-            // Assume the error was missing root node and try
-            // again... there isn't a typed exception so we KNOW it is
-            // because of a missing root node.
-            document = DOMUtil.documentFromString("<root>" + xml + "</root>");
-            addedRoot = true;
+    /**
+     * Construct with an inputStream of xml.  If the xml does not have
+     * a root node, then a &lt;root&gt; node will be wrapped around
+     * the entire xml content, and all immediate children of the
+     * inserted root will be selected (if there are any, otherwise it
+     * will be an empty set of selected elements).  If this happens,
+     * the stream will be reset, which might cause an XmlException if
+     * the stream doesn't support mark/reset.
+     *
+     * Note that the inputStream is not explicitly closed from this
+     * method.
+     *
+     * @param inputStream The xml to parse.
+     * @throws XmlException If there is a problem reading.
+     */
+    public Q(InputStream inputStream) {
+        this(null, null, inputStream, false);
+    }
+
+    /**
+     * Construct with a reader of xml.  If the xml does not have a
+     * root node, then a &lt;root&gt; node will be wrapped around the
+     * entire xml content, and all immediate children of the inserted
+     * root will be selected (if there are any, otherwise it will be
+     * an empty set of selected elements).  If this happens, the
+     * reader will be reset, which might cause an XmlException if the
+     * reader doesn't support mark/reset.
+     *
+     * Note that the reader is not explicitly closed from this method.
+     *
+     * @param reader The xml to parse.
+     * @throws XmlException If there is a problem reading.
+     */
+    public Q(Reader reader) throws XmlException {
+        this(null, reader, null, false);
+    }
+
+    /**
+     * Construct with a file of xml to read from.  If the xml does not
+     * have a root node, then a &lt;root&gt; node will be wrapped
+     * around the entire xml content, and all immediate children of
+     * the inserted root will be selected (if there are any, otherwise
+     * it will be an empty set of selected elements).
+     *
+     * @param reader The xml to parse.
+     * @throws XmlException If there is a problem reading.
+     */
+    public Q(File file) throws XmlException {
+        this(file, null, null, true);
+    }
+
+    private Q(File file, Reader reader, InputStream stream, boolean close) throws XmlException {
+        if ((file != null && reader != null)
+                || (file != null && stream != null)
+                || (reader != null && stream != null)) {
+            throw new IllegalArgumentException("Only one of a file, reader or stream is allowed!");
         }
 
-        this.document = document;
+        if (file != null) {
+            // Close files no matter what.
+            close = true;
 
-        if (addedRoot) {
-            this.elements = frizzle().select(":root > *");
-        } else {
-            this.elements = new Element[] { document.getDocumentElement() };
+            try {
+                reader = new FileReader(file);
+            } catch (IOException e) {
+                throw new XmlException("There was a problem while reading the XML.", e);
+            }
+        }
+
+        boolean thrown = true;
+
+        try {
+            this.selector = "";
+            Document document = null;
+            boolean addedRoot = false;
+
+            // TODO: Try to inhibit error messages about content not being
+            // allowed in the prolog (when there is no root node).
+            try {
+                if (reader != null) {
+                    document = DOMUtil.documentFromReader(reader);
+                } else if (stream != null) {
+                    document = DOMUtil.documentFromStream(stream);
+                } else {
+                    throw new NullPointerException("One of a file, reader or stream is required!");
+                }
+            } catch (LSException e) {
+                // Assume the error was missing root node and try
+                // again... there isn't a typed exception so we KNOW it is
+                // because of a missing root node.
+                if (reader != null) {
+                    reader.reset();
+                    Reader combined = IOUtil.join(new StringReader("<root>"), reader, new StringReader("</root>"));
+                    document = DOMUtil.documentFromReader(combined);
+                    addedRoot = true;
+                } else {
+                    stream.reset();
+                    InputStream combined = IOUtil.join(new ByteArrayInputStream("<root>".getBytes()), stream, new ByteArrayInputStream("</root>".getBytes()));
+                    document = DOMUtil.documentFromStream(combined);
+                    addedRoot = true;
+                }
+            }
+
+            this.document = document;
+
+            if (addedRoot) {
+                this.elements = frizzle().select(":root > *");
+            } else {
+                this.elements = new Element[] { document.getDocumentElement() };
+            }
+
+            thrown = false;
+        } catch (IOException e) {
+            throw new XmlException("There was a problem while reading the XML.", e);
+        } finally {
+            if (close) {
+                try {
+                    Closeables.close(reader, thrown);
+                    Closeables.close(stream, thrown);
+                } catch (IOException e) {
+                    throw new XmlException("There was a problem while reading the XML.", e);
+                }
+            }
         }
     }
 
@@ -194,9 +305,64 @@ public class Q implements Iterable<Element> {
      *
      * @param xml The xml to parse.
      * @return A Q with the parsed root element(s) selected.
+     * @throws XmlException If there is a problem reading.
      */
-    public static Q $(String xml) {
+    public static Q $(String xml) throws XmlException {
         return new Q(xml);
+    }
+
+    /**
+     * Construct with an inputStream of xml.  If the xml does not have
+     * a root node, then a &lt;root&gt; node will be wrapped around
+     * the entire xml content, and all immediate children of the
+     * inserted root will be selected (if there are any, otherwise it
+     * will be an empty set of selected elements).  If this happens,
+     * the stream will be reset, which might cause an XmlException if
+     * the stream doesn't support mark/reset.
+     *
+     * Note that the inputStream is not explicitly closed from this
+     * method.
+     *
+     * @param inputStream The xml to parse.
+     * @return A Q with the parsed root element(s) selected.
+     * @throws XmlException If there is a problem reading.
+     */
+    public static Q $(InputStream inputStream) {
+        return new Q(inputStream);
+    }
+
+    /**
+     * Construct with a reader of xml.  If the xml does not have a
+     * root node, then a &lt;root&gt; node will be wrapped around the
+     * entire xml content, and all immediate children of the inserted
+     * root will be selected (if there are any, otherwise it will be
+     * an empty set of selected elements).  If this happens, the
+     * reader will be reset, which might cause an XmlException if the
+     * reader doesn't support mark/reset.
+     *
+     * Note that the reader is not explicitly closed from this method.
+     *
+     * @param reader The xml to parse.
+     * @return A Q with the parsed root element(s) selected.
+     * @throws XmlException If there is a problem reading.
+     */
+    public static Q $(Reader reader) {
+        return new Q(reader);
+    }
+
+    /**
+     * Construct with a file of xml to read from.  If the xml does not
+     * have a root node, then a &lt;root&gt; node will be wrapped
+     * around the entire xml content, and all immediate children of
+     * the inserted root will be selected (if there are any, otherwise
+     * it will be an empty set of selected elements).
+     *
+     * @param reader The xml to parse.
+     * @return A Q with the parsed root element(s) selected.
+     * @throws XmlException If there is a problem reading.
+     */
+    public static Q $(File file) throws XmlException {
+        return new Q(file);
     }
 
     /**
@@ -300,6 +466,10 @@ public class Q implements Iterable<Element> {
     }
 
     private void nodesToWriterOrStream(NodeList nodes, Writer writer, OutputStream stream) throws XmlException {
+        if (writer != null && stream != null) {
+            throw new IllegalArgumentException("Only one of a writer or stream is allowed!");
+        }
+
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer transformer = factory.newTransformer();
@@ -1005,10 +1175,10 @@ public class Q implements Iterable<Element> {
         }
 
         try {
-            FileOutputStream out = new FileOutputStream(file);
+            FileWriter out = new FileWriter(file);
 
             try {
-                nodesToWriterOrStream(new SingleNodeList(document().getDocumentElement()), null, out);
+                nodesToWriterOrStream(new SingleNodeList(document().getDocumentElement()), out, null);
                 return this;
             } finally {
                 out.close();
@@ -1023,6 +1193,9 @@ public class Q implements Iterable<Element> {
      * outputStream.  If there is no document associated with it, then
      * this method immediately returns this without doing anything
      * (which can happen if $() is called).
+     *
+     * Note that the outputStream is not explicitly closed from this
+     * method.
      *
      * @param outputStream The stream to write the xml to.
      * @return This Q.
@@ -1042,6 +1215,8 @@ public class Q implements Iterable<Element> {
      * writer.  If there is no document associated with it, then this
      * method immediately returns this without doing anything (which
      * can happen if $() is called).
+     *
+     * Note that the writer is not explicitly closed from this method.
      *
      * @param writer The writer to write the xml to.
      * @return This Q.

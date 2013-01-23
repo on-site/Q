@@ -2,7 +2,12 @@ package com.on_site.q;
 
 import static com.on_site.q.Q.$;
 
+import com.google.common.io.Files;
 import com.on_site.util.TestBase;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.StringReader;
 
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -92,14 +97,56 @@ public class QTest extends TestBase {
     }
 
     public void xmlFileQConstructor() throws Exception {
-        // TODO
+        File in = tempFile();
+        Files.write("<test><sub /><sub>content</sub></test>".getBytes(), in);
+        Q q = $(in);
+        assertSelectedSize(q, 1);
+        assertNodeName(q.get(0), "test");
+
+        in = tempFile();
+        Files.write("This <sub />is <child>some <sub />content</child> that is technically invalid xml.".getBytes(), in);
+        q = $(in);
+        assertSelectedSize(q, 2);
+        assertNodeName(q.get(0), "sub");
+        assertNodeName(q.get(1), "child");
+        assertNodeText(q.get(1), "some content");
+        assertNodeName(q.get(0).getParentNode(), "root");
+        assertNodeText(q.get(0).getParentNode(), "This is some content that is technically invalid xml.");
     }
 
     public void xmlInputStreamQConstructor() throws Exception {
-        // TODO
+        ByteArrayInputStream in = new ByteArrayInputStream("<test><sub /><sub>content</sub></test>".getBytes());
+        Q q = $(in);
+        in.close();
+        assertSelectedSize(q, 1);
+        assertNodeName(q.get(0), "test");
+
+        in = new ByteArrayInputStream("This <sub />is <child>some <sub />content</child> that is technically invalid xml.".getBytes());
+        q = $(in);
+        in.close();
+        assertSelectedSize(q, 2);
+        assertNodeName(q.get(0), "sub");
+        assertNodeName(q.get(1), "child");
+        assertNodeText(q.get(1), "some content");
+        assertNodeName(q.get(0).getParentNode(), "root");
+        assertNodeText(q.get(0).getParentNode(), "This is some content that is technically invalid xml.");
     }
 
     public void xmlReaderQConstructor() throws Exception {
-        // TODO
+        StringReader in = new StringReader("<test><sub /><sub>content</sub></test>");
+        Q q = $(in);
+        in.close();
+        assertSelectedSize(q, 1);
+        assertNodeName(q.get(0), "test");
+
+        in = new StringReader("This <sub />is <child>some <sub />content</child> that is technically invalid xml.");
+        q = $(in);
+        in.close();
+        assertSelectedSize(q, 2);
+        assertNodeName(q.get(0), "sub");
+        assertNodeName(q.get(1), "child");
+        assertNodeText(q.get(1), "some content");
+        assertNodeName(q.get(0).getParentNode(), "root");
+        assertNodeText(q.get(0).getParentNode(), "This is some content that is technically invalid xml.");
     }
 }

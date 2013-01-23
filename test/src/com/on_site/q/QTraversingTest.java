@@ -23,6 +23,9 @@ public class QTraversingTest extends TestBase {
         assertEquals(q.find("sub:eq(0)").end(), q, "The resulting Q");
         assertEquals(q.first().end(), q, "The resulting Q");
         assertEquals(q.last().end(), q, "The resulting Q");
+        assertEquals(q.next().end(), q, "The resulting Q");
+        assertEquals(q.nextAll().end(), q, "The resulting Q");
+        assertEquals(q.prev().end(), q, "The resulting Q");
         assertEquals(q.prevAll().end(), q, "The resulting Q");
     }
 
@@ -126,6 +129,31 @@ public class QTraversingTest extends TestBase {
     }
 
     @Test
+    public void next() throws Exception {
+        Q q = $("sub", document("<test><sub/><sub>content</sub> sibling content <sub>More content</sub></test>"));
+        assertEquals($("sub:eq(2)", q.document()).next().isEmpty(), true, "isEmpty");
+        assertEquals($("sub:eq(1)", q.document()).next().size(), 1, "Size");
+        assertEquals($("sub:eq(1)", q.document()).next().get(0), q.get(2), "Element");
+        assertEquals($("sub:eq(0)", q.document()).next().size(), 1, "Size");
+        assertEquals($("sub:eq(0)", q.document()).next().get(0), q.get(1), "Element");
+
+        q = $("sub", document("<test><container1><sub/><sub>content</sub> sibling content <sub>More content</sub></container1>" +
+                              "<container2><sub/><sub>content</sub> sibling content <sub>More content</sub></container2></test>"));
+        assertEquals($("container1 sub:eq(0), container2 sub:eq(1)", q.document()).next().size(), 2, "Size");
+        assertEquals($("container1 sub:eq(0), container2 sub:eq(1)", q.document()).next().get(0), q.get(1), "Element");
+        assertEquals($("container1 sub:eq(0), container2 sub:eq(1)", q.document()).next().get(1), q.get(5), "Element");
+    }
+
+    @Test
+    public void nextSelector() throws Exception {
+        Q q = $("sub", document("<test><sub/><sib/><sub>content</sub> sibling content <sub>More content</sub></test>"));
+        assertEquals($("sub:eq(0)", q.document()).next("sub").isEmpty(), true, "isEmpty");
+        assertEquals($("sub:eq(0)", q.document()).next("sib").size(), 1, "Size");
+        assertEquals($("sub:eq(0)", q.document()).next("sib").get(0), $("sib", q.document()).get(0), "Element");
+        assertEquals($("sub:eq(0)", q.document()).next("argle").isEmpty(), true, "isEmpty");
+    }
+
+    @Test
     public void nextAll() throws Exception {
         Q q = $("sub", document("<test><sub/><sub>content</sub> sibling content <sub>More content</sub></test>"));
         assertEquals($("sub:eq(2)", q.document()).nextAll().isEmpty(), true, "isEmpty");
@@ -152,6 +180,31 @@ public class QTraversingTest extends TestBase {
         assertEquals($("sub:eq(0)", q.document()).nextAll("sib").size(), 1, "Size");
         assertEquals($("sub:eq(0)", q.document()).nextAll("sib").get(0), $("sib", q.document()).get(0), "Element");
         assertEquals($("sub:eq(0)", q.document()).nextAll("argle").isEmpty(), true, "isEmpty");
+    }
+
+    @Test
+    public void prev() throws Exception {
+        Q q = $("sub", document("<test><sub/><sub>content</sub> sibling content <sub>More content</sub></test>"));
+        assertEquals($("sub:eq(0)", q.document()).prev().isEmpty(), true, "isEmpty");
+        assertEquals($("sub:eq(1)", q.document()).prev().size(), 1, "Size");
+        assertEquals($("sub:eq(1)", q.document()).prev().get(0), q.get(0), "Element");
+        assertEquals($("sub:eq(2)", q.document()).prev().size(), 1, "Size");
+        assertEquals($("sub:eq(2)", q.document()).prev().get(0), q.get(1), "Element");
+
+        q = $("sub", document("<test><container1><sub/><sub>content</sub> sibling content <sub>More content</sub></container1>" +
+                              "<container2><sub/><sub>content</sub> sibling content <sub>More content</sub></container2></test>"));
+        assertEquals($("container1 sub:eq(2), container2 sub:eq(1)", q.document()).prev().size(), 2, "Size");
+        assertEquals($("container1 sub:eq(2), container2 sub:eq(1)", q.document()).prev().get(0), q.get(1), "Element");
+        assertEquals($("container1 sub:eq(2), container2 sub:eq(1)", q.document()).prev().get(1), q.get(3), "Element");
+    }
+
+    @Test
+    public void prevSelector() throws Exception {
+        Q q = $("sub", document("<test><sub/><sib/><sub>content</sub> sibling content <sub>More content</sub></test>"));
+        assertEquals($("sub:eq(2)", q.document()).prev("sub").size(), 1, "Size");
+        assertEquals($("sub:eq(2)", q.document()).prev("sub").get(0), q.get(1), "Element");
+        assertEquals($("sub:eq(2)", q.document()).prev("sib").isEmpty(), true, "isEmpty");
+        assertEquals($("sub:eq(2)", q.document()).prev("argle").isEmpty(), true, "isEmpty");
     }
 
     @Test

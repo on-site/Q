@@ -1011,7 +1011,54 @@ public class Q implements Iterable<Element> {
     }
 
     // map()
-    // next()
+
+    /**
+     * Filter the currently selected elements to be just the next
+     * sibling element of all the selected elements.
+     *
+     * @return A Q of all the first next sibling of each selected
+     * element.
+     */
+    public Q next() {
+        return next(null);
+    }
+
+    /**
+     * Filter the currently selected elements to be just the next
+     * sibling element of all the selected elements.  Only include
+     * elements that match the given selector (if it is non-null).
+     *
+     * @param selector Selector to filter the returned elements, if
+     * non-null.
+     * @return A Q of all the first next sibling of each selected
+     * element.
+     */
+    public Q next(String selector) {
+        if (isEmpty()) {
+            return $select();
+        }
+
+        List<Element> result = new LinkedList<Element>();
+
+        for (Node current : this) {
+            while (current.getNextSibling() != null) {
+                current = current.getNextSibling();
+
+                if (!(current instanceof Element)) {
+                    continue;
+                }
+
+                if (selector != null && !frizzle().matchesSelector((Element) current, selector)) {
+                    break;
+                }
+
+                result.add((Element) current);
+                break;
+            }
+        }
+
+        return $select(result);
+    }
 
     /**
      * Filter the currently selected elements to be just the next
@@ -1064,7 +1111,54 @@ public class Q implements Iterable<Element> {
     // parent()
     // parents()
     // parentsUntil()
-    // prev()
+
+    /**
+     * Filter the currently selected elements to be just the previous
+     * sibling element of all the selected elements.
+     *
+     * @return A Q of all the first previous sibling of each selected
+     * element.
+     */
+    public Q prev() {
+        return prev(null);
+    }
+
+    /**
+     * Filter the currently selected elements to be just the previous
+     * sibling element of all the selected elements.  Only include
+     * elements that match the given selector (if it is non-null).
+     *
+     * @param selector Selector to filter the returned elements, if
+     * non-null.
+     * @return A Q of all the first previous sibling of each selected
+     * element.
+     */
+    public Q prev(String selector) {
+        if (isEmpty()) {
+            return $select();
+        }
+
+        List<Element> result = new LinkedList<Element>();
+
+        for (Node current : this) {
+            while (current.getPreviousSibling() != null) {
+                current = current.getPreviousSibling();
+
+                if (!(current instanceof Element)) {
+                    continue;
+                }
+
+                if (selector != null && !frizzle().matchesSelector((Element) current, selector)) {
+                    break;
+                }
+
+                result.add((Element) current);
+                break;
+            }
+        }
+
+        return $select(result);
+    }
 
     /**
      * Filter the currently selected elements to be just the previous

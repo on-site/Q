@@ -1,0 +1,8 @@
+<TicTacToe id="9001">
+  <Move from="128">
+    <Row>2</Row>
+    <Cell>1</Cell>
+  </Move>
+
+  <Message>You are about to LOSE!</Message>
+</TicTacToe>

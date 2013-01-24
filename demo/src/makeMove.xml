@@ -1,0 +1,8 @@
+<TicTacToe>
+  <Move>
+    <Row />
+    <Cell />
+  </Move>
+
+  <Message />
+</TicTacToe>

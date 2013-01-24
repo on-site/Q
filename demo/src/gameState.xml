@@ -31,15 +31,15 @@
       <Name>Turanga Leela</Name>
       <Moves>
         <Move number="1" row="2" cell="2" />
-        <Move number="2" row="1" cell="3" />
+        <Move number="3" row="1" cell="3" />
       </Moves>
     </Player>
 
     <Player for="O" id="128">
       <Name>Philip J. Fry</Name>
       <Moves>
-        <Move number="1" row="1" cell="1" />
-        <Move number="2" row="2" cell="1" />
+        <Move number="2" row="1" cell="1" />
+        <Move number="4" row="2" cell="1" />
       </Moves>
     </Player>
   </Players>

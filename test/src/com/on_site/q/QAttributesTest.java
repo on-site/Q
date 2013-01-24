@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.testng.annotations.Test;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 
 public class QAttributesTest extends TestBase {
@@ -70,7 +71,15 @@ public class QAttributesTest extends TestBase {
 
     @Test
     public void attrNameValueWithInvalidAttributes() throws Exception {
-        // TODO
-        // Make sure setting attribute values that are invalid for XML will auto be escaped.
+        Q q = $("sub", $("<test><sub foo=\"something\"/></test>"));
+        q.attr("foo", "<something/> \"disallowed\" & isn't it fun!");
+        assertEquals(q.attr("foo"), "<something/> \"disallowed\" & isn't it fun!", "Attribute value");
+        assertEquals(q.parent().xml(), "<sub foo=\"&lt;something/&gt; &quot;disallowed&quot; &amp; isn't it fun!\"/>", "XML");
+    }
+
+    @Test(expectedExceptions = DOMException.class)
+    public void attrNameValueWithIllegalAttrKeyValues() throws Exception {
+        Q q = $("sub", $("<test><sub/></test>"));
+        q.attr("<something/> \"disallowed\" & isn't it fun!", "value");
     }
 }

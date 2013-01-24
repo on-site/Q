@@ -44,7 +44,10 @@ public class QManipulationTest extends TestBase {
 
     @Test
     public void textTextWithXmlCharacters() throws Exception {
-        // TODO
+        Q q = $("sub", $("<test><sub>Some <b>content</b></sub></test>"));
+        q.text("this is a <test/> & it's \"fun\"");
+        assertEquals(q.text(), "this is a <test/> & it's \"fun\"", "Text");
+        assertEquals(q.xml(), "this is a &lt;test/&gt; &amp; it's \"fun\"", "XML");
     }
 
     @Test

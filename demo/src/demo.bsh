@@ -16,3 +16,7 @@ $(Element element) { return Q.$(element); }
 $(Element[] elements) { return Q.$(elements); }
 $(String selector, Document document) { return Q.$(selector, document); }
 $(String selector, Q context) { return Q.$(selector, context); }
+
+gameState() { return Demo.class.getResourceAsStream("gameState.xml"); }
+makeMoveExample() { return Demo.class.getResourceAsStream("makeMoveExample.xml"); }
+makeMove() { return Demo.class.getResourceAsStream("makeMove.xml"); }

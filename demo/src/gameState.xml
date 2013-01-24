@@ -1,0 +1,46 @@
+<TicTacToe id="9001">
+  <CreatedDate month="1" day="24" year="2013" time="12:34 AM" />
+
+  <State>
+    <Row number="1">
+      <Cell number="1">O</Cell>
+      <Cell number="2"></Cell>
+      <Cell number="3">X</Cell>
+    </Row>
+    <Row number="2">
+      <Cell number="1">O</Cell>
+      <Cell number="2">X</Cell>
+      <Cell number="3"></Cell>
+    </Row>
+    <Row number="3">
+      <Cell number="1"></Cell>
+      <Cell number="2"></Cell>
+      <Cell number="3"></Cell>
+    </Row>
+    <Display>
+      O| |X
+      -----
+      O|X|
+      -----
+       | |
+    </Display>
+  </State>
+
+  <Players>
+    <Player for="X" id="42">
+      <Name>Turanga Leela</Name>
+      <Moves>
+        <Move number="1" row="2" cell="2" />
+        <Move number="2" row="1" cell="3" />
+      </Moves>
+    </Player>
+
+    <Player for="O" id="128">
+      <Name>Philip J. Fry</Name>
+      <Moves>
+        <Move number="1" row="1" cell="1" />
+        <Move number="2" row="2" cell="1" />
+      </Moves>
+    </Player>
+  </Players>
+</TicTacToe>

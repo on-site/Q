@@ -24,6 +24,9 @@ makeMove() { return Demo.class.getResourceAsStream("makeMove.xml"); }
 printBanner() {
     print("Welcome to the Q Demo!");
     print("");
+    print("In this demo, you can play with Q!  Q is imported, and though BeanShell doesn't");
+    print("support static imports, it is as if Q.$ is statically imported.");
+    print("");
     print("Available example XML streams:");
     print("  gameState()");
     print("  makeMoveExample()");

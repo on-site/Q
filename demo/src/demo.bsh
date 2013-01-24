@@ -20,3 +20,24 @@ $(String selector, Q context) { return Q.$(selector, context); }
 gameState() { return Demo.class.getResourceAsStream("gameState.xml"); }
 makeMoveExample() { return Demo.class.getResourceAsStream("makeMoveExample.xml"); }
 makeMove() { return Demo.class.getResourceAsStream("makeMove.xml"); }
+
+printBanner() {
+    print("Welcome to the Q Demo!");
+    print("");
+    print("Available example XML streams:");
+    print("  gameState()");
+    print("  makeMoveExample()");
+    print("  makeMove()");
+    print("");
+    print("View the XML:");
+    print("  cat(gameState());");
+    print("  cat(makeMoveExample());");
+    print("  cat(makeMove());");
+    print("Obtain a Q instance:");
+    print("  $state = $(gameState());");
+    print("  $example = $(makeMoveExample());");
+    print("  $move = $(makeMove());");
+    print("Print this banner:");
+    print("  printBanner();");
+    print("");
+}

@@ -569,6 +569,23 @@ public class Q implements Iterable<Element> {
     }
 
     /**
+     * Set the attribute to the given object with the given name for
+     * all selected elements.  If the object is null, an empty string
+     * is used, otherwise the result of object.toString() is used.
+     *
+     * @param name The name of the attribute to set.
+     * @param object The new value of the attribute.
+     * @return This Q.
+     */
+    public Q attr(String name, Object object) {
+        if (object == null) {
+            object = "";
+        }
+
+        return this.attr(name, object.toString());
+    }
+
+    /**
      * For each key/value pair of the given map, set the attribute
      * with the key value as the name to the value of the key/value
      * pair, for all selected elements.
@@ -662,6 +679,22 @@ public class Q implements Iterable<Element> {
         }
 
         return this;
+    }
+
+    /**
+     * Set the text of all selected elements to the given object.  If
+     * the object is null, an empty string is used, otherwise
+     * object.toString() is used.
+     *
+     * @param object The text to set.
+     * @return This Q.
+     */
+    public Q text(Object object) {
+        if (object == null) {
+            object = "";
+        }
+
+        return this.text(object.toString());
     }
 
     /**

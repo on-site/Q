@@ -27,6 +27,20 @@ public class QManipulationTest extends TestBase {
     }
 
     @Test
+    public void textObject() throws Exception {
+        Q q = $("sub", $("<test><sub>Content <b>with some</b> sub content. <endingTag value=\"something\"/></sub><sub>content</sub><sub /></test>"));
+        q.text(123);
+        assertEquals($("sub:eq(0)", q.document()).text(), "123", "Text");
+        assertEquals($("sub:eq(1)", q.document()).text(), "123", "Text");
+        assertEquals($("sub:eq(2)", q.document()).text(), "123", "Text");
+
+        q.text((Object) null);
+        assertEquals($("sub:eq(0)", q.document()).text(), "", "Text");
+        assertEquals($("sub:eq(1)", q.document()).text(), "", "Text");
+        assertEquals($("sub:eq(2)", q.document()).text(), "", "Text");
+    }
+
+    @Test
     public void textMap() throws Exception {
         Q q = $("sub", document("<test><sub>Content <b>with some</b> sub content. <endingTag value=\"something\"/></sub><sub>content</sub><sub /></test>"));
         final int[] i = new int[] { 0 };

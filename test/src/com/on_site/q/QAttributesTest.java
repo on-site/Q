@@ -32,6 +32,18 @@ public class QAttributesTest extends TestBase {
     }
 
     @Test
+    public void attrNameObject() throws Exception {
+        Q q = $("sub", document("<test><sub foo='something' bar='' /><sub>content</sub></test>"));
+        q.attr("foo", 123);
+        assertEquals(q.eq(0).attr("foo"), "123", "Attribute value");
+        assertEquals(q.eq(1).attr("foo"), "123", "Attribute value");
+
+        q.attr("foo", (Object) null);
+        assertEquals(q.eq(0).attr("foo"), "", "Attribute value");
+        assertEquals(q.eq(1).attr("foo"), "", "Attribute value");
+    }
+
+    @Test
     public void attrAttributes() throws Exception {
         Q q = $("sub", document("<test><sub foo='something' bar='' /><sub>content</sub></test>"));
         Map<String, String> attributes = new HashMap<String, String>();

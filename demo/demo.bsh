@@ -1,0 +1,18 @@
+// From root of Q repo:
+// Step 1:
+//   java -cp lib/bsh-2.0b2.jar bsh.Interpreter
+// Step 2:
+//   source("demo/demo.bsh");
+// Step 3:
+//   print(Q.$("<test>Have fun in the console!</test>").write());
+import java.io.File;
+
+for (File file : new File("lib").listFiles()) {
+    if (file.getPath().endsWith(".jar")) {
+        addClassPath(file.getAbsolutePath());
+    }
+}
+
+addClassPath("dist/q.jar");
+
+import com.on_site.q.Q;

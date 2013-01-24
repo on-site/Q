@@ -5,3 +5,6 @@
 /test/reports
 /test/build
 /test/lib
+/demo/lib
+/demo/build
+/demo/dist

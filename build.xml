@@ -8,11 +8,17 @@
   <property name="test.lib" location="test/lib" />
   <property name="test.build" location="test/build" />
   <property name="test.reports" location="test/reports" />
+  <property name="demo.src" location="demo/src" />
+  <property name="demo.build" location="demo/build" />
+  <property name="demo.dist" location="demo/dist" />
+  <property name="demo.jar" location="${demo.dist}/demo.jar" />
+  <property name="demo.lib" location="demo/lib" />
   <property name="rhino.jar" location="${lib}/js.jar" />
   <property name="guava.jar" location="${lib}/guava-14.0-rc1.jar" />
   <property name="log4j.jar" location="${lib}/log4j-1.2.17.jar" />
   <property name="frizzle.jar" location="${lib}/frizzle.jar" />
   <property name="testng.jar" location="${test.lib}/testng-6.8.jar" />
+  <property name="bsh.jar" location="${demo.lib}/bsh-2.0b2.jar" />
 
   <path id="classpath">
     <pathelement location="${rhino.jar}" />
@@ -31,11 +37,23 @@
     <pathelement location="${test.build}"/>
   </path>
 
+  <path id="demo.classpath">
+    <pathelement location="${rhino.jar}" />
+    <pathelement location="${guava.jar}" />
+    <pathelement location="${log4j.jar}" />
+    <pathelement location="${frizzle.jar}" />
+    <pathelement location="${bsh.jar}" />
+    <pathelement location="${q.jar}" />
+  </path>
+
   <target name="clean" description="clean up">
     <delete dir="${build}" />
     <delete dir="${test.build}" />
     <delete file="${q.jar}" />
     <delete dir="${dist}" />
+    <delete dir="${demo.build}" />
+    <delete file="${demo.jar}" />
+    <delete dir="${demo.dist}" />
   </target>
 
   <target name="init">
@@ -96,5 +114,36 @@
     <testng classpathref="test.classpath" outputDir="${test.reports}" haltOnFailure="true" verbose="2">
       <classfileset dir="${test.build}" includes="**/*Test.class" />
     </testng>
+  </target>
+
+  <target name="init-demo" depends="init">
+    <mkdir dir="${demo.build}" />
+    <mkdir dir="${demo.dist}" />
+
+    <fail message="Missing ${bsh.jar}, please download it.">
+      <condition>
+        <not><available file="${bsh.jar}" /></not>
+      </condition>
+    </fail>
+  </target>
+
+  <target name="compile-demo" depends="init-demo, jar">
+    <javac srcdir="${demo.src}" destdir="${demo.build}" classpathref="demo.classpath" debug="true" />
+  </target>
+
+  <target name="jar-demo" depends="compile-demo">
+    <jar jarfile="${demo.jar}">
+      <fileset dir="${demo.build}"/>
+      <zipfileset src="${rhino.jar}" />
+      <zipfileset src="${guava.jar}" />
+      <zipfileset src="${log4j.jar}" />
+      <zipfileset src="${frizzle.jar}" />
+      <zipfileset src="${bsh.jar}" />
+      <zipfileset src="${q.jar}" />
+
+      <manifest>
+        <attribute name="Main-Class" value="Demo" />
+      </manifest>
+    </jar>
   </target>
 </project>

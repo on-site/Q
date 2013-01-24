@@ -132,6 +132,8 @@
   </target>
 
   <target name="jar-demo" depends="compile-demo">
+    <copy file="${demo.src}/demo.bsh" todir="${demo.build}" />
+
     <jar jarfile="${demo.jar}">
       <fileset dir="${demo.build}"/>
       <zipfileset src="${rhino.jar}" />

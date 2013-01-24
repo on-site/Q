@@ -10,8 +10,29 @@ import org.w3c.dom.Element;
 
 public class QTraversingTest extends TestBase {
     @Test
+    public void children() throws Exception {
+        Q q = $("sub", $("<test><sub/> <something /> <sub><p>Some sub <b>content</b></p></sub> <sub><b>More</b> sub <p>content <br/></p></sub></test>"));
+        assertEquals(q.children().size(), 3, "Size");
+        assertEquals(q.children().get(0), $("sub:eq(1) p", q.document()).get(0), "Element");
+        assertEquals(q.children().get(1), $("sub:eq(2) b", q.document()).get(0), "Element");
+        assertEquals(q.children().get(2), $("sub:eq(2) p", q.document()).get(0), "Element");
+
+        assertEquals($("sub", $("<test><sub/></test>")).children().isEmpty(), true, "isEmpty");
+    }
+
+    @Test
+    public void childrenSelector() throws Exception {
+        Q q = $("sub", $("<test><sub/> <something /> <sub><p>Some sub <b>content</b></p></sub> <sub><b>More</b> sub <p>content <br/></p></sub></test>"));
+        assertEquals(q.children("p").size(), 2, "Size");
+        assertEquals(q.children("p").get(0), $("sub:eq(1) p", q.document()).get(0), "Element");
+        assertEquals(q.children("p").get(1), $("sub:eq(2) p", q.document()).get(0), "Element");
+
+        assertEquals(q.children("nothing").isEmpty(), true, "isEmpty");
+    }
+
+    @Test
     public void end() throws Exception {
-        Q q = $("sub", document("<test><sub/><sub>content</sub></test>"));
+        Q q = $("sub", $("<test><sub/><sub>content</sub></test>"));
         assertEquals(q.eq(0).end(), q, "The resulting Q");
         assertEquals(q.end().size(), 1, "Size");
         assertEquals(q.end().get(0), $("test", q.document()).get(0), "Selected item");
@@ -19,6 +40,7 @@ public class QTraversingTest extends TestBase {
         assertEquals($("argle", q.document()).end().size(), 0, "Size");
 
         // Testing other filtering methods to ensure they pop properly
+        assertEquals(q.children().end(), q, "The resulting Q");
         assertEquals(q.filter("sub:eq(0)").end(), q, "The resulting Q");
         assertEquals(q.find("sub:eq(0)").end(), q, "The resulting Q");
         assertEquals(q.first().end(), q, "The resulting Q");

@@ -10,6 +10,7 @@ import com.google.common.io.Closeables;
 import com.on_site.frizzle.Frizzle;
 import com.on_site.util.DOMUtil;
 import com.on_site.util.IOUtil;
+import com.on_site.util.NodeListIterable;
 import com.on_site.util.SingleNodeList;
 
 import java.io.ByteArrayInputStream;
@@ -491,8 +492,8 @@ public class Q implements Iterable<Element> {
                 throw new NullPointerException("One of a writer or stream is required!");
             }
 
-            for (int i = 0; i < nodes.getLength(); i++) {
-                transformer.transform(new DOMSource(nodes.item(i)), output);
+            for (Node node : new NodeListIterable(nodes)) {
+                transformer.transform(new DOMSource(node), output);
             }
         } catch (TransformerException e) {
             throw new XmlException(e);
@@ -727,8 +728,8 @@ public class Q implements Iterable<Element> {
             for (Element element : this) {
                 element.setTextContent("");
 
-                for (int i = 0; i < nodes.getLength(); i++) {
-                    Node node = document().importNode(nodes.item(i), true);
+                for (Node n : new NodeListIterable(nodes)) {
+                    Node node = document().importNode(n, true);
                     element.appendChild(node);
                 }
             }
@@ -767,8 +768,8 @@ public class Q implements Iterable<Element> {
                 NodeList nodes = document.getDocumentElement().getChildNodes();
                 element.setTextContent("");
 
-                for (int i = 0; i < nodes.getLength(); i++) {
-                    Node node = document().importNode(nodes.item(i), true);
+                for (Node n : new NodeListIterable(nodes)) {
+                    Node node = document().importNode(n, true);
                     element.appendChild(node);
                 }
             }
@@ -892,9 +893,47 @@ public class Q implements Iterable<Element> {
     // add()
     // addBack()
     // andSelf()
-    // children()
+
+    /**
+     * Select all the immediate children (1 level deep) of the
+     * currently selected nodes.
+     *
+     * @return The filtered results.
+     */
+    public Q children() {
+        return children(null);
+    }
+
+    /**
+     * Select all the immediate children (1 level deep) of the
+     * currently selected nodes, but only those that match the given
+     * selector.
+     *
+     * @param selector The selector to filter the children, or null to
+     * not filter them by selector.
+     * @return The filtered results.
+     */
+    public Q children(String selector) {
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element element : this) {
+            for (Node node : new NodeListIterable(element.getChildNodes())) {
+                if (!(node instanceof Element)) {
+                    continue;
+                }
+
+                if (selector != null && !frizzle().matchesSelector((Element) node, selector)) {
+                    continue;
+                }
+
+                result.add((Element) node);
+            }
+        }
+
+        return $select(result);
+    }
+
     // closest()
-    // contents()
 
     /**
      * End the current stack of filtered elements.  If this is the top
@@ -1384,7 +1423,14 @@ public class Q implements Iterable<Element> {
         return $select(result);
     }
 
-    // siblings()
+    public Q siblings() {
+        throw new RuntimeException("TODO");
+    }
+
+    public Q siblings(String selector) {
+        throw new RuntimeException("TODO");
+    }
+
     // slice()
 
     // -------------- Additional utility methods not defined by jQuery --------------

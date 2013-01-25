@@ -44,6 +44,7 @@ public class QTraversingTest extends TestBase {
         assertEquals(q.filter("sub:eq(0)").end(), q, "The resulting Q");
         assertEquals(q.find("sub:eq(0)").end(), q, "The resulting Q");
         assertEquals(q.first().end(), q, "The resulting Q");
+        assertEquals(q.has("sub").end(), q, "The resulting Q");
         assertEquals(q.last().end(), q, "The resulting Q");
         assertEquals(q.next().end(), q, "The resulting Q");
         assertEquals(q.nextAll().end(), q, "The resulting Q");
@@ -107,7 +108,7 @@ public class QTraversingTest extends TestBase {
 
     @Test
     public void findSelector() throws Exception {
-        Q q = $("sub", document("<test><sub/><sub>content<sub>More</sub></sub></test>"));
+        Q q = $("sub", $("<test><sub/><sub>content<sub>More</sub></sub></test>"));
         assertEquals($("test", q.document()).find("sub").size(), 3, "Size");
         assertEquals($("test", q.document()).find("sub").get(0), q.get(0), "Element");
         assertEquals($("test", q.document()).find("sub").get(1), q.get(1), "Element");
@@ -118,7 +119,7 @@ public class QTraversingTest extends TestBase {
 
     @Test
     public void findQ() throws Exception {
-        Q q = $("sub", document("<test><sib/><container><sub/></container><sub>content<sub>More</sub></sub></test>"));
+        Q q = $("sub", $("<test><sib/><container><sub/></container><sub>content<sub>More</sub></sub></test>"));
         assertEquals($("test", q.document()).find(q).size(), 3, "Size");
         assertEquals($("test", q.document()).find(q).get(0), q.get(0), "Element");
         assertEquals($("test", q.document()).find(q).get(1), q.get(1), "Element");
@@ -132,26 +133,50 @@ public class QTraversingTest extends TestBase {
 
     @Test
     public void findElement() throws Exception {
+        Q q = $("sub", $("<test><sib/><container><sub/></container><sub>content<sub>More</sub></sub></test>"));
+        assertEquals($("test", q.document()).find($("sub:eq(1)", q.document()).get(0)).size(), 1, "Size");
+        assertEquals($("test", q.document()).find($("sub:eq(1)", q.document()).get(0)).get(0), q.get(1), "Element");
+        assertEquals($("container", q.document()).find($("sub:eq(1)", q.document()).get(0)).isEmpty(), true, "isEmpty");
     }
 
     @Test
     public void first() throws Exception {
-        Q q = $("sub", document("<test><sub/><sub>content</sub></test>"));
+        Q q = $("sub", $("<test><sub/><sub>content</sub></test>"));
         assertEquals(q.first().size(), 1, "Size");
         assertEquals(q.first().get(0), q.get(0), "Selected item");
         assertEquals(q.first().first().get(0), q.get(0), "Selected item");
     }
 
     @Test
+    public void hasSelector() throws Exception {
+        Q q = $("sub", $("<test><container><sub><sib/></sub></container><sub>content<sub>More</sub> <sib/></sub></test>"));
+        assertEquals(q.has("sib").size(), 2, "Size");
+        assertEquals(q.has("sib").get(0), q.get(0), "Element");
+        assertEquals(q.has("sib").get(1), q.get(1), "Element");
+        assertEquals(q.has("sub").size(), 1, "Size");
+        assertEquals(q.has("sub").get(0), q.get(1), "Element");
+        assertEquals(q.has("container").isEmpty(), true, "isEmpty");
+    }
+
+    @Test
+    public void hasElement() throws Exception {
+        Q q = $("sub", $("<test><container><sub><sib/></sub></container><sub>content<sub>More <sib/></sub></sub></test>"));
+        assertEquals(q.has($("sib:eq(1)", q.document()).get(0)).size(), 2, "Size");
+        assertEquals(q.has($("sib:eq(1)", q.document()).get(0)).get(0), q.get(1), "Element");
+        assertEquals(q.has($("sib:eq(1)", q.document()).get(0)).get(1), q.get(2), "Element");
+        assertEquals(q.has($("container", q.document()).get(0)).isEmpty(), true, "isEmpty");
+    }
+
+    @Test
     public void isSelector() throws Exception {
-        Q q = $("sub", document("<test><sub/><sub>content</sub></test>"));
+        Q q = $("sub", $("<test><sub/><sub>content</sub></test>"));
         assertEquals(q.is("sub"), true, "Is sub");
         assertEquals(q.is("sib"), false, "Is sib");
     }
 
     @Test
     public void isPredicate() throws Exception {
-        Q q = $("sub", document("<test><sub/><sub>content</sub></test>"));
+        Q q = $("sub", $("<test><sub/><sub>content</sub></test>"));
         assertEquals(q.is(new Predicate<Element>() {
             @Override
             public boolean apply(Element element) {
@@ -168,7 +193,7 @@ public class QTraversingTest extends TestBase {
 
     @Test
     public void isQ() throws Exception {
-        Q q = $("sub", document("<test><sub/><sub>content</sub></test>"));
+        Q q = $("sub", $("<test><sub/><sub>content</sub></test>"));
         assertEquals(q.is(q), true, "Is sub");
         assertEquals(q.is($("sub:eq(1)", q.document())), true, "Is sub");
         assertEquals(q.is($("test", q.document())), false, "Is test");
@@ -176,7 +201,7 @@ public class QTraversingTest extends TestBase {
 
     @Test
     public void isElement() throws Exception {
-        Q q = $("sub", document("<test><sub/><sub>content</sub></test>"));
+        Q q = $("sub", $("<test><sub/><sub>content</sub></test>"));
         assertEquals(q.is(q.get(0)), true, "Is sub");
         assertEquals(q.is($("test", q.document()).get(0)), false, "Is test");
     }

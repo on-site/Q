@@ -1142,7 +1142,44 @@ public class Q implements Iterable<Element> {
         return eq(0);
     }
 
-    // has()
+    /**
+     * Reduce the selected elements to those that contain elements
+     * that match the given selector.
+     *
+     * @param selector The selector to check.
+     * @return A new Q with elements that contain elements that match
+     * the selector.
+     */
+    public Q has(String selector) {
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element context : this) {
+            if (frizzle.select(selector, context).length > 0) {
+                result.add(context);
+            }
+        }
+
+        return $select(result);
+    }
+
+    /**
+     * Reduce the selected elements to those that contain the given
+     * element.
+     *
+     * @param element The element to check containment.
+     * @return A new Q with elements that contain the element.
+     */
+    public Q has(Element element) {
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element context : this) {
+            if (frizzle.contains(context, element)) {
+                result.add(context);
+            }
+        }
+
+        return $select(result);
+    }
 
     /**
      * Determine if the given selector applies for any selected

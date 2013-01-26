@@ -1,5 +1,7 @@
 package com.on_site.q;
 
+import com.on_site.fn.ElementPredicate;
+
 import org.w3c.dom.Element;
 
 /**
@@ -28,4 +30,7 @@ public abstract class Pseudo extends com.on_site.frizzle.Pseudo {
     public String name() {
         return name;
     }
+
+    @Override
+    public abstract ElementPredicate apply(String argument);
 }

@@ -21,7 +21,7 @@ public class QAdditionalTest extends TestBase {
 
     @Test(expectedExceptions = { IllegalArgumentException.class })
     public void exprWithSameNameCalledTwice() throws Exception {
-        Pseudo pseudo = new Pseudo(":YetAnotherNewSelector") {
+        SimplePseudo pseudo = new SimplePseudo(":YetAnotherNewSelector") {
             @Override
             public boolean apply(Element element, String argument) {
                 return element.getNodeName().equals("sub");
@@ -34,7 +34,7 @@ public class QAdditionalTest extends TestBase {
 
     @Test
     public void expr() throws Exception {
-        Q.expr(new Pseudo("testSub") {
+        Q.expr(new SimplePseudo("testSub") {
             @Override
             public boolean apply(Element element, String argument) {
                 return element.getNodeName().equals("sub");

@@ -70,6 +70,7 @@ public class Q implements Iterable<Element> {
     private final Document document;
     private Q previousQ;
     private ImmutableList<Element> list;
+    private ConcurrentMap<String, Pseudo> pseudos;
 
     // -------------- Constructors --------------
 
@@ -516,6 +517,14 @@ public class Q implements Iterable<Element> {
         } catch (TransformerException e) {
             throw new XmlException(e);
         }
+    }
+
+    private ConcurrentMap<String, Pseudo> pseudos() {
+        if (pseudos == null) {
+            pseudos = Maps.newConcurrentMap();
+        }
+
+        return pseudos;
     }
 
     private Q $select() {
@@ -1700,14 +1709,41 @@ public class Q implements Iterable<Element> {
     }
 
     /**
-     * Define a custom css pseudo class.
+     * Define a custom css pseudo class that is available to all Q
+     * instances that use the document associated with this Q.
+     *
+     * Note that it is undefined what will happen if you create a
+     * global pseudo and a document level pseudo with the same name.
      *
      * @param pseudo The pseudo to use.
      * @throws IllegalArgumentException If the name returned from
      * pseudo.name() has already been defined as a Q pseudo, with a
      * different pseudo instance.
      */
-    public static void expr(final Pseudo pseudo) throws IllegalArgumentException {
+    public Q expr(final Pseudo pseudo) throws IllegalArgumentException {
+        Pseudo existing = pseudos().putIfAbsent(pseudo.name(), pseudo);
+
+        if (existing != null && existing != pseudo) {
+            throw new IllegalArgumentException("There is already a pseudo defined for '" + pseudo.name() + "'");
+        }
+
+        frizzle().createPseudo(pseudo.name(), pseudo);
+        return this;
+    }
+
+    /**
+     * Define a custom css pseudo class that is globally available to
+     * all Q instances.
+     *
+     * Note that it is undefined what will happen if you create a
+     * global pseudo and a document level pseudo with the same name.
+     *
+     * @param pseudo The pseudo to use.
+     * @throws IllegalArgumentException If the name returned from
+     * pseudo.name() has already been defined as a Q pseudo, with a
+     * different pseudo instance.
+     */
+    public static void globalExpr(Pseudo pseudo) throws IllegalArgumentException {
         Pseudo existing = PSEUDOS.putIfAbsent(pseudo.name(), pseudo);
 
         if (existing != null && existing != pseudo) {

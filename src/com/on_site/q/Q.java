@@ -12,6 +12,7 @@ import com.on_site.util.DOMUtil;
 import com.on_site.util.IOUtil;
 import com.on_site.util.NodeListIterable;
 import com.on_site.util.SingleNodeList;
+import com.on_site.util.TODO;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -923,9 +924,33 @@ public class Q implements Iterable<Element> {
 
     // -------------- Traversing --------------
 
-    // add()
-    // addBack()
-    // andSelf()
+    public Q add(String selector) throws TODO {
+        throw new TODO();
+    }
+
+    public Q add(Element element) throws TODO {
+        throw new TODO();
+    }
+
+    public Q add(Element[] elements) throws TODO {
+        throw new TODO();
+    }
+
+    public Q add(Q q) throws TODO {
+        throw new TODO();
+    }
+
+    public Q add(String selector, Element context) throws TODO {
+        throw new TODO();
+    }
+
+    public Q addBack() throws TODO {
+        throw new TODO();
+    }
+
+    public Q addBack(String selector) throws TODO {
+        throw new TODO();
+    }
 
     /**
      * Select all the immediate children (1 level deep) of the
@@ -966,7 +991,21 @@ public class Q implements Iterable<Element> {
         return $select(result);
     }
 
-    // closest()
+    public Q closest(String selector) throws TODO {
+        throw new TODO();
+    }
+
+    public Q closest(String selector, Element context) throws TODO {
+        throw new TODO();
+    }
+
+    public Q closest(Q q) throws TODO {
+        throw new TODO();
+    }
+
+    public Q closest(Element element) throws TODO {
+        throw new TODO();
+    }
 
     /**
      * End the current stack of filtered elements.  If this is the top
@@ -1246,7 +1285,21 @@ public class Q implements Iterable<Element> {
         return eq(-1);
     }
 
-    // map()
+    public Q mapToElement(Function<Element, Element> toElement) throws TODO {
+        throw new TODO();
+    }
+
+    public Q mapToElements(Function<Element, Element[]> toElements) throws TODO {
+        throw new TODO();
+    }
+
+    public Q map(Function<Element, Q> toQ) throws TODO {
+        throw new TODO();
+    }
+
+    public <T> List<T> map(Function<Element, T> map) throws TODO {
+        throw new TODO();
+    }
 
     /**
      * Filter the currently selected elements to be just the next
@@ -1341,9 +1394,49 @@ public class Q implements Iterable<Element> {
         return $select(result);
     }
 
-    // nextUntil()
-    // not()
-    // offsetParent()
+    public Q nextUntil(String selector) throws TODO {
+        throw new TODO();
+    }
+
+    public Q nextUntil(String selector, String filter) throws TODO {
+        throw new TODO();
+    }
+
+    public Q nextUntil(Element element) throws TODO {
+        throw new TODO();
+    }
+
+    public Q nextUntil(Element element, String filter) throws TODO {
+        throw new TODO();
+    }
+
+    public Q nextUntil(Q q) throws TODO {
+        throw new TODO();
+    }
+
+    public Q nextUntil(Q q, String filter) throws TODO {
+        throw new TODO();
+    }
+
+    public Q not(String selector) throws TODO {
+        throw new TODO();
+    }
+
+    public Q not(Element element) throws TODO {
+        throw new TODO();
+    }
+
+    public Q not(Element[] elements) throws TODO {
+        throw new TODO();
+    }
+
+    public Q not(Predicate<Element> predicate) throws TODO {
+        throw new TODO();
+    }
+
+    public Q not(Q q) throws TODO {
+        throw new TODO();
+    }
 
     /**
      * Obtain a Q of all the parent elements of the selected elements.
@@ -1390,15 +1483,37 @@ public class Q implements Iterable<Element> {
         return $select(result);
     }
 
-    public Q parents() {
-        throw new RuntimeException("TODO");
+    public Q parents() throws TODO {
+        throw new TODO();
     }
 
-    public Q parents(String selector) {
-        throw new RuntimeException("TODO");
+    public Q parents(String selector) throws TODO {
+        throw new TODO();
     }
 
-    // parentsUntil()
+    public Q parentsUntil(String selector) throws TODO {
+        throw new TODO();
+    }
+
+    public Q parentsUntil(String selector, String filter) throws TODO {
+        throw new TODO();
+    }
+
+    public Q parentsUntil(Element element) throws TODO {
+        throw new TODO();
+    }
+
+    public Q parentsUntil(Element element, String filter) throws TODO {
+        throw new TODO();
+    }
+
+    public Q parentsUntil(Q q) throws TODO {
+        throw new TODO();
+    }
+
+    public Q parentsUntil(Q q, String filter) throws TODO {
+        throw new TODO();
+    }
 
     /**
      * Filter the currently selected elements to be just the previous
@@ -1493,15 +1608,45 @@ public class Q implements Iterable<Element> {
         return $select(result);
     }
 
-    public Q siblings() {
-        throw new RuntimeException("TODO");
+    public Q prevUntil(String selector) throws TODO {
+        throw new TODO();
     }
 
-    public Q siblings(String selector) {
-        throw new RuntimeException("TODO");
+    public Q prevUntil(String selector, String filter) throws TODO {
+        throw new TODO();
     }
 
-    // slice()
+    public Q prevUntil(Element element) throws TODO {
+        throw new TODO();
+    }
+
+    public Q prevUntil(Element element, String filter) throws TODO {
+        throw new TODO();
+    }
+
+    public Q prevUntil(Q q) throws TODO {
+        throw new TODO();
+    }
+
+    public Q prevUntil(Q q, String filter) throws TODO {
+        throw new TODO();
+    }
+
+    public Q siblings() throws TODO {
+        throw new TODO();
+    }
+
+    public Q siblings(String selector) throws TODO {
+        throw new TODO();
+    }
+
+    public Q slice(int start) throws TODO {
+        throw new TODO();
+    }
+
+    public Q slice(int start, int end) throws TODO {
+        throw new TODO();
+    }
 
     // -------------- Additional utility methods not defined by jQuery --------------
 

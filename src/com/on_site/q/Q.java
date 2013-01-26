@@ -1,8 +1,11 @@
 package com.on_site.q;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
 import com.on_site.fn.ElementPredicate;
@@ -35,6 +38,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -65,7 +69,6 @@ public class Q implements Iterable<Element> {
     private final Element[] elements;
     private final Document document;
     private Q previousQ;
-    private Frizzle frizzle;
     private ImmutableList<Element> list;
 
     // -------------- Constructors --------------
@@ -454,16 +457,26 @@ public class Q implements Iterable<Element> {
         return ImmutableSet.<Element>builder().add(elements).build();
     }
 
+    private static final ConcurrentMap<Document, Frizzle> FRIZZLES = new MapMaker().weakKeys().makeComputingMap(new Function<Document, Frizzle>() {
+        @Override
+        public Frizzle apply(Document document) {
+            return new Frizzle(document);
+        }
+    });
+
+    private static final ConcurrentMap<String, Pseudo> PSEUDOS = Maps.newConcurrentMap();
+
     private Frizzle frizzle() {
-        if (frizzle != null) {
-            return frizzle;
+        Frizzle frizzle = FRIZZLES.get(document());
+
+        synchronized (frizzle) {
+            for (Pseudo pseudo : PSEUDOS.values()) {
+                if (!frizzle.hasPseudo(pseudo.name())) {
+                    frizzle.createPseudo(pseudo.name(), pseudo);
+                }
+            }
         }
 
-        if (document() == null) {
-            throw new IllegalStateException("That operation requires a known document!");
-        }
-
-        frizzle = new Frizzle(document());
         return frizzle;
     }
 
@@ -1172,7 +1185,7 @@ public class Q implements Iterable<Element> {
 
         for (Element context : this) {
             for (Element element : q) {
-                if (frizzle.contains(context, element)) {
+                if (frizzle().contains(context, element)) {
                     result.add(element);
                 }
             }
@@ -1192,7 +1205,7 @@ public class Q implements Iterable<Element> {
         List<Element> result = new LinkedList<Element>();
 
         for (Element context : this) {
-            if (frizzle.contains(context, element)) {
+            if (frizzle().contains(context, element)) {
                 result.add(element);
             }
         }
@@ -1221,7 +1234,7 @@ public class Q implements Iterable<Element> {
         List<Element> result = new LinkedList<Element>();
 
         for (Element context : this) {
-            if (frizzle.select(selector, context).length > 0) {
+            if (frizzle().select(selector, context).length > 0) {
                 result.add(context);
             }
         }
@@ -1240,7 +1253,7 @@ public class Q implements Iterable<Element> {
         List<Element> result = new LinkedList<Element>();
 
         for (Element context : this) {
-            if (frizzle.contains(context, element)) {
+            if (frizzle().contains(context, element)) {
                 result.add(context);
             }
         }
@@ -1684,6 +1697,19 @@ public class Q implements Iterable<Element> {
         }
 
         return asList().equals(o);
+    }
+
+    /**
+     * Define a custom css pseudo class.
+     *
+     * @param pseudo The pseudo to use.
+     * @throws IllegalArgumentException If the name returned from
+     * pseudo.name() has already been defined as a Q pseudo.
+     */
+    public static void expr(final Pseudo pseudo) throws IllegalArgumentException {
+        if (PSEUDOS.putIfAbsent(pseudo.name(), pseudo) != null) {
+            throw new IllegalArgumentException("There is already a pseudo defined for '" + pseudo.name() + "'");
+        }
     }
 
     public int hashCode() {

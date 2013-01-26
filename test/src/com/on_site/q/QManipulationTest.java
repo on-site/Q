@@ -2,7 +2,7 @@ package com.on_site.q;
 
 import static com.on_site.q.Q.$;
 
-import com.google.common.base.Function;
+import com.on_site.fn.ElementToString;
 import com.on_site.util.TestBase;
 
 import org.testng.annotations.Test;
@@ -44,7 +44,7 @@ public class QManipulationTest extends TestBase {
     public void textMap() throws Exception {
         Q q = $("sub", document("<test><sub>Content <b>with some</b> sub content. <endingTag value=\"something\"/></sub><sub>content</sub><sub /></test>"));
         final int[] i = new int[] { 0 };
-        q.text(new Function<Element, String>() {
+        q.text(new ElementToString() {
             @Override
             public String apply(Element element) {
                 int n = i[0]++;
@@ -85,7 +85,7 @@ public class QManipulationTest extends TestBase {
     public void xmlMap() throws Exception {
         Q q = $("sub", document("<test><sub>Content <b>with some</b> sub content. <endingTag value=\"something\"/></sub><sub>content</sub><sub /></test>"));
         final int[] i = new int[] { 0 };
-        q.xml(new Function<Element, String>() {
+        q.xml(new ElementToString() {
             @Override
             public String apply(Element element) {
                 int n = i[0]++;

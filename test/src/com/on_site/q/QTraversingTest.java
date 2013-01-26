@@ -2,7 +2,7 @@ package com.on_site.q;
 
 import static com.on_site.q.Q.$;
 
-import com.google.common.base.Predicate;
+import com.on_site.fn.ElementPredicate;
 import com.on_site.util.TestBase;
 
 import org.testng.annotations.Test;
@@ -79,7 +79,7 @@ public class QTraversingTest extends TestBase {
     public void filterPredicate() throws Exception {
         Q q = $("sub, sib", document("<test><sib/><container><sub/><sib/></container><sub>content<sub>More</sub></sub></test>"));
 
-        Q filtered = q.filter(new Predicate<Element>() {
+        Q filtered = q.filter(new ElementPredicate() {
             @Override
             public boolean apply(Element element) {
                 return element.getNodeName().equals("sib");
@@ -177,13 +177,13 @@ public class QTraversingTest extends TestBase {
     @Test
     public void isPredicate() throws Exception {
         Q q = $("sub", $("<test><sub/><sub>content</sub></test>"));
-        assertEquals(q.is(new Predicate<Element>() {
+        assertEquals(q.is(new ElementPredicate() {
             @Override
             public boolean apply(Element element) {
                 return true;
             }
         }), true, "Is true");
-        assertEquals(q.is(new Predicate<Element>() {
+        assertEquals(q.is(new ElementPredicate() {
             @Override
             public boolean apply(Element element) {
                 return false;

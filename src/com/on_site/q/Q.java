@@ -1,12 +1,16 @@
 package com.on_site.q;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
+import com.on_site.fn.ElementPredicate;
+import com.on_site.fn.ElementToElement;
+import com.on_site.fn.ElementToElements;
+import com.on_site.fn.ElementToGeneric;
+import com.on_site.fn.ElementToQ;
+import com.on_site.fn.ElementToString;
 import com.on_site.frizzle.Frizzle;
 import com.on_site.util.DOMUtil;
 import com.on_site.util.IOUtil;
@@ -610,7 +614,7 @@ public class Q implements Iterable<Element> {
      * @param map A mapping function of element to attribute value.
      * @return This Q.
      */
-    public Q attr(String name, Function<Element, String> map) {
+    public Q attr(String name, ElementToString map) {
         for (Element element : this) {
             element.setAttribute(name, map.apply(element));
         }
@@ -646,6 +650,30 @@ public class Q implements Iterable<Element> {
     }
 
     // -------------- Manipulation --------------
+
+    public Q after(String xml) throws TODO {
+        throw new TODO();
+    }
+
+    public Q after(Element element) throws TODO {
+        throw new TODO();
+    }
+
+    public Q after(Q q) throws TODO {
+        throw new TODO();
+    }
+
+    public Q after(ElementToQ toQ) throws TODO {
+        throw new TODO();
+    }
+
+    public Q after(ElementToString toXml) throws TODO {
+        throw new TODO();
+    }
+
+    public Q after(ElementToElement toElement) throws TODO {
+        throw new TODO();
+    }
 
     /**
      * Retrieve the text for the first selected element as a string.
@@ -710,7 +738,7 @@ public class Q implements Iterable<Element> {
      * @param map a mapping function of element to text.
      * @return This Q.
      */
-    public Q text(Function<Element, String> map) {
+    public Q text(ElementToString map) {
         for (Element element : this) {
             element.setTextContent(map.apply(element));
         }
@@ -792,7 +820,7 @@ public class Q implements Iterable<Element> {
      * @throws XmlException If there is a problem parsing the xml or
      * inserting it into each element.
      */
-    public Q xml(Function<Element, String> map) throws XmlException {
+    public Q xml(ElementToString map) throws XmlException {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
@@ -1053,7 +1081,7 @@ public class Q implements Iterable<Element> {
      * @return A new Q with the filtered elements.
      */
     public Q filter(final String selector) {
-        return filter(new Predicate<Element>() {
+        return filter(new ElementPredicate() {
             @Override
             public boolean apply(Element element) {
                 return frizzle().matchesSelector(element, selector);
@@ -1069,7 +1097,7 @@ public class Q implements Iterable<Element> {
      * @param predicate The predicate to filter elements by.
      * @return A new Q with the filtered elements.
      */
-    public Q filter(Predicate<Element> predicate) {
+    public Q filter(ElementPredicate predicate) {
         List<Element> result = new LinkedList<Element>();
 
         for (Element element : this) {
@@ -1089,7 +1117,7 @@ public class Q implements Iterable<Element> {
      * @return A new Q with the filtered elements.
      */
     public Q filter(final Element element) {
-        return filter(new Predicate<Element>() {
+        return filter(new ElementPredicate() {
             @Override
             public boolean apply(Element e) {
                 return e == element;
@@ -1105,7 +1133,7 @@ public class Q implements Iterable<Element> {
      * @return A new Q with the filtered elements.
      */
     public Q filter(final Q q) {
-        return filter(new Predicate<Element>() {
+        return filter(new ElementPredicate() {
             @Override
             public boolean apply(Element element) {
                 return q.asList().contains(element);
@@ -1244,7 +1272,7 @@ public class Q implements Iterable<Element> {
      * @param predicate The predicate to test against each element.
      * @return Whether the predicate returns true for any element.
      */
-    public boolean is(Predicate<Element> predicate) {
+    public boolean is(ElementPredicate predicate) {
         for (Element element : this) {
             if (predicate.apply(element)) {
                 return true;
@@ -1285,19 +1313,19 @@ public class Q implements Iterable<Element> {
         return eq(-1);
     }
 
-    public Q mapToElement(Function<Element, Element> toElement) throws TODO {
+    public Q map(ElementToElement toElement) throws TODO {
         throw new TODO();
     }
 
-    public Q mapToElements(Function<Element, Element[]> toElements) throws TODO {
+    public Q map(ElementToElements toElements) throws TODO {
         throw new TODO();
     }
 
-    public Q map(Function<Element, Q> toQ) throws TODO {
+    public Q map(ElementToQ toQ) throws TODO {
         throw new TODO();
     }
 
-    public <T> List<T> map(Function<Element, T> map) throws TODO {
+    public <T> List<T> map(ElementToGeneric map) throws TODO {
         throw new TODO();
     }
 
@@ -1430,7 +1458,7 @@ public class Q implements Iterable<Element> {
         throw new TODO();
     }
 
-    public Q not(Predicate<Element> predicate) throws TODO {
+    public Q not(ElementPredicate predicate) throws TODO {
         throw new TODO();
     }
 

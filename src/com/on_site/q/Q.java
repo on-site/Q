@@ -1704,10 +1704,13 @@ public class Q implements Iterable<Element> {
      *
      * @param pseudo The pseudo to use.
      * @throws IllegalArgumentException If the name returned from
-     * pseudo.name() has already been defined as a Q pseudo.
+     * pseudo.name() has already been defined as a Q pseudo, with a
+     * different pseudo instance.
      */
     public static void expr(final Pseudo pseudo) throws IllegalArgumentException {
-        if (PSEUDOS.putIfAbsent(pseudo.name(), pseudo) != null) {
+        Pseudo existing = PSEUDOS.putIfAbsent(pseudo.name(), pseudo);
+
+        if (existing != null && existing != pseudo) {
             throw new IllegalArgumentException("There is already a pseudo defined for '" + pseudo.name() + "'");
         }
     }

@@ -19,7 +19,7 @@ public class QAdditionalTest extends TestBase {
         $("<test><sib/><sub/><sib><sub/></sib></test>").find(":nonExistentSelector");
     }
 
-    @Test(expectedExceptions = { IllegalArgumentException.class })
+    @Test
     public void exprWithSameNameCalledTwice() throws Exception {
         SimplePseudo pseudo = new SimplePseudo(":YetAnotherNewSelector") {
             @Override
@@ -29,7 +29,29 @@ public class QAdditionalTest extends TestBase {
         };
 
         Q.expr(pseudo);
-        Q.expr(pseudo);
+
+        try {
+            Q.expr(pseudo);
+        } catch (Exception e) {
+            fail("No exception was expected", e);
+        }
+    }
+
+    @Test(expectedExceptions = { IllegalArgumentException.class })
+    public void exprWithSameNameDifferentPseudoCalledTwice() throws Exception {
+        Q.expr(new SimplePseudo(":YetAnotherNewSelector") {
+            @Override
+            public boolean apply(Element element, String argument) {
+                return element.getNodeName().equals("sub");
+            }
+        });
+
+        Q.expr(new SimplePseudo(":YetAnotherNewSelector") {
+            @Override
+            public boolean apply(Element element, String argument) {
+                return element.getNodeName().equals("sub");
+            }
+        });
     }
 
     @Test

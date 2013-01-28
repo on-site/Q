@@ -697,6 +697,66 @@ public class Q implements Iterable<Element> {
         throw new TODO();
     }
 
+    public Q append(String xml) throws TODO {
+        throw new TODO();
+    }
+
+    public Q append(Element element) throws TODO {
+        throw new TODO();
+    }
+
+    public Q append(Q q) throws TODO {
+        throw new TODO();
+    }
+
+    public Q append(ElementToQ toQ) throws TODO {
+        throw new TODO();
+    }
+
+    public Q append(ElementToString toXml) throws TODO {
+        throw new TODO();
+    }
+
+    public Q append(ElementToElement toElement) throws TODO {
+        throw new TODO();
+    }
+
+    public Q appendTo(String xml) throws TODO {
+        throw new TODO();
+    }
+
+    public Q appendTo(Element element) throws TODO {
+        throw new TODO();
+    }
+
+    public Q appendTo(Q q) throws TODO {
+        throw new TODO();
+    }
+
+    public Q before(String xml) throws TODO {
+        throw new TODO();
+    }
+
+    public Q before(Element element) throws TODO {
+        throw new TODO();
+    }
+
+    public Q before(Q q) throws TODO {
+        throw new TODO();
+    }
+
+    public Q before(ElementToQ toQ) throws TODO {
+        throw new TODO();
+    }
+
+    public Q before(ElementToString toXml) throws TODO {
+        throw new TODO();
+    }
+
+    public Q before(ElementToElement toElement) throws TODO {
+        throw new TODO();
+    }
+
     /**
      * Retrieve the text for the first selected element as a string.
      * The text will not include any xml nodes.  If there are no

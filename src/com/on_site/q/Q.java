@@ -705,8 +705,31 @@ public class Q implements Iterable<Element> {
         throw new TODO();
     }
 
-    public Q append(Q q) throws TODO {
-        throw new TODO();
+    /**
+     * Append each element selected in q to each element selected in
+     * this Q.
+     *
+     * @param q The elements to append in to each node selected.
+     * @return This Q.
+     */
+    public Q append(Q q) {
+        List<Node> nodes = new LinkedList<Node>();
+
+        // Copy ahead of time in case we are appending nodes to the
+        // nodes being appended from.
+        for (Element element : q) {
+            Node node = document().importNode(element, true);
+            nodes.add(node);
+        }
+
+        for (Element parent : this) {
+            for (Node n : nodes) {
+                Node node = document().importNode(n, true);
+                parent.appendChild(node);
+            }
+        }
+
+        return this;
     }
 
     public Q append(ElementToQ toQ) throws TODO {

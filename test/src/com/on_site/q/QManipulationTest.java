@@ -10,6 +10,32 @@ import org.w3c.dom.Element;
 
 public class QManipulationTest extends TestBase {
     @Test
+    public void appendXml() throws Exception {
+        Q q = $("sub", $("<test><sub></sub><sub /> a <sib/> <sub>Some <i>content</i> here</sub></test>"));
+        q.append("<b>this is a test</b>");
+        assertEquals(q.write(), "<test><sub><b>this is a test</b></sub><sub><b>this is a test</b></sub> a <sib/> <sub>Some <i>content</i> here<b>this is a test</b></sub></test>", "XML");
+
+        q = $("sub", $("<test><sub>one</sub> <sub>two</sub></test>"));
+        q.append("<three>four</three> and <five/>");
+        assertEquals(q.write(), "<test><sub>one<three>four</three> and <five/></sub> <sub>two<three>four</three> and <five/></sub></test>", "XML");
+    }
+
+    @Test
+    public void appendElement() throws Exception {
+        Q q = $("sub", $("<test><sub></sub><sub /> a <sib/> <sub>Some <i>content</i> here</sub></test>"));
+        q.append($("<b>this is a test</b>").get(0));
+        assertEquals(q.write(), "<test><sub><b>this is a test</b></sub><sub><b>this is a test</b></sub> a <sib/> <sub>Some <i>content</i> here<b>this is a test</b></sub></test>", "XML");
+
+        q = $("sub", $("<test><sub /> a <sib><b>with</b> stuff</sib> <sub>Some <i>content</i> here</sub></test>"));
+        q.append($("sib", q.document()).get(0));
+        assertEquals(q.write(), "<test><sub><sib><b>with</b> stuff</sib></sub> a <sib><b>with</b> stuff</sib> <sub>Some <i>content</i> here<sib><b>with</b> stuff</sib></sub></test>", "XML");
+
+        q = $("sub", $("<test><sub>content</sub> <sub>simple </sub></test>"));
+        q.append($("sub:eq(0)", q.document()).get(0));
+        assertEquals(q.write(), "<test><sub>content<sub>content</sub></sub> <sub>simple <sub>content</sub></sub></test>", "XML");
+    }
+
+    @Test
     public void appendQ() throws Exception {
         Q q = $("sub", $("<test><sub></sub><sub /> a <sib/> <sub>Some <i>content</i> here</sub></test>"));
         q.append($("<b>this is a test</b>"));

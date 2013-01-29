@@ -554,6 +554,20 @@ public class Q implements Iterable<Element> {
         return list.toArray(new Element[list.size()]);
     }
 
+    private NodeList xmlToNodes(String xml) throws XmlException {
+        try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document document = builder.parse(new InputSource(new StringReader("<root>" + xml + "</root>")));
+            return document.getDocumentElement().getChildNodes();
+        } catch (IOException e) {
+            throw new XmlException(e);
+        } catch (ParserConfigurationException e) {
+            throw new XmlException(e);
+        } catch (SAXException e) {
+            throw new XmlException(e);
+        }
+    }
+
     // -------------- Attributes --------------
 
     /**
@@ -697,12 +711,45 @@ public class Q implements Iterable<Element> {
         throw new TODO();
     }
 
-    public Q append(String xml) throws TODO {
-        throw new TODO();
+    /**
+     * Append the given xml content into each element selected in this
+     * Q.
+     *
+     * @param xml The xml to append to each node selected.
+     * @return This Q.
+     * @throws XmlException If there is a problem parsing the xml or
+     * appending it to each element.
+     */
+    public Q append(String xml) throws XmlException {
+        NodeList nodes = xmlToNodes(xml);
+
+        for (Element parent : this) {
+            for (Node n : new NodeListIterable(nodes)) {
+                Node node = document().importNode(n, true);
+                parent.appendChild(node);
+            }
+        }
+
+        return this;
     }
 
-    public Q append(Element element) throws TODO {
-        throw new TODO();
+    /**
+     * Append the element to each element selected in this Q.
+     *
+     * @param element The element to append to each node selected.
+     * @return This Q.
+     */
+    public Q append(Element element) {
+        // Copy ahead of time in case we are appending the node to the
+        // nodes being appended from.
+        Node n = document().importNode(element, true);
+
+        for (Element parent : this) {
+            Node node = document().importNode(n, true);
+            parent.appendChild(node);
+        }
+
+        return this;
     }
 
     /**
@@ -887,25 +934,15 @@ public class Q implements Iterable<Element> {
      * inserting it into each element.
      */
     public Q xml(String xml) throws XmlException {
-        try {
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document document = builder.parse(new InputSource(new StringReader("<root>" + xml + "</root>")));
-            NodeList nodes = document.getDocumentElement().getChildNodes();
+        NodeList nodes = xmlToNodes(xml);
 
-            for (Element element : this) {
-                element.setTextContent("");
+        for (Element element : this) {
+            element.setTextContent("");
 
-                for (Node n : new NodeListIterable(nodes)) {
-                    Node node = document().importNode(n, true);
-                    element.appendChild(node);
-                }
+            for (Node n : new NodeListIterable(nodes)) {
+                Node node = document().importNode(n, true);
+                element.appendChild(node);
             }
-        } catch (IOException e) {
-            throw new XmlException(e);
-        } catch (ParserConfigurationException e) {
-            throw new XmlException(e);
-        } catch (SAXException e) {
-            throw new XmlException(e);
         }
 
         return this;

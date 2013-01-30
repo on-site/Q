@@ -699,15 +699,15 @@ public class Q implements Iterable<Element> {
         throw new TODO();
     }
 
-    public Q after(ElementToQ toQ) throws TODO {
-        throw new TODO();
-    }
-
     public Q after(ElementToString toXml) throws TODO {
         throw new TODO();
     }
 
     public Q after(ElementToElement toElement) throws TODO {
+        throw new TODO();
+    }
+
+    public Q after(ElementToQ toQ) throws TODO {
         throw new TODO();
     }
 
@@ -779,15 +779,34 @@ public class Q implements Iterable<Element> {
         return this;
     }
 
-    public Q append(ElementToQ toQ) throws TODO {
-        throw new TODO();
-    }
+    /**
+     * Append the xml content returned from toXml invoked with each
+     * element selected in this Q into each element.
+     *
+     * @param toXml The xml map function to obtain the xml to append
+     * to each node selected.
+     * @return This Q.
+     * @throws XmlException If there is a problem parsing the xml or
+     * appending it to each element.
+     */
+    public Q append(ElementToString toXml) throws XmlException {
+        for (Element parent : this) {
+            NodeList nodes = xmlToNodes(toXml.apply(parent));
 
-    public Q append(ElementToString toXml) throws TODO {
-        throw new TODO();
+            for (Node n : new NodeListIterable(nodes)) {
+                Node node = document().importNode(n, true);
+                parent.appendChild(node);
+            }
+        }
+
+        return this;
     }
 
     public Q append(ElementToElement toElement) throws TODO {
+        throw new TODO();
+    }
+
+    public Q append(ElementToQ toQ) throws TODO {
         throw new TODO();
     }
 
@@ -815,15 +834,15 @@ public class Q implements Iterable<Element> {
         throw new TODO();
     }
 
-    public Q before(ElementToQ toQ) throws TODO {
-        throw new TODO();
-    }
-
     public Q before(ElementToString toXml) throws TODO {
         throw new TODO();
     }
 
     public Q before(ElementToElement toElement) throws TODO {
+        throw new TODO();
+    }
+
+    public Q before(ElementToQ toQ) throws TODO {
         throw new TODO();
     }
 

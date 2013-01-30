@@ -55,6 +55,45 @@ public class QManipulationTest extends TestBase {
     }
 
     @Test
+    public void appendFnToXml() throws Exception {
+        Q q = $("sub", $("<test><sub></sub><sub /> a <sib/> <sub>Some <i>content</i> here</sub></test>"));
+        final int[] i = { 0 };
+
+        q.append(new ElementToString() {
+            @Override
+            public String apply(Element element) {
+                i[0]++;
+                return "<b>this is " + i[0] + " test</b>";
+            }
+        });
+
+        assertEquals(q.write(), "<test><sub><b>this is 1 test</b></sub><sub><b>this is 2 test</b></sub> a <sib/> <sub>Some <i>content</i> here<b>this is 3 test</b></sub></test>", "XML");
+
+        q = $("sub", $("<test><sub>one</sub> <sub>two</sub></test>"));
+        i[0] = 0;
+
+        q.append(new ElementToString() {
+            @Override
+            public String apply(Element element) {
+                i[0]++;
+                return "<three>four</three> " + i[0] + " and <five/>";
+            }
+        });
+
+        assertEquals(q.write(), "<test><sub>one<three>four</three> 1 and <five/></sub> <sub>two<three>four</three> 2 and <five/></sub></test>", "XML");
+    }
+
+    @Test
+    public void appendFnToElement() throws Exception {
+        // TODO
+    }
+
+    @Test
+    public void appendFnToQ() throws Exception {
+        // TODO
+    }
+
+    @Test
     public void text() throws Exception {
         Q q = $("sub", $("<test><sub>Content <b>with some</b> sub content. <endingTag value=\"something\"/></sub><sub>content</sub><sub /></test>"));
         assertEquals(q.text(), "Content with some sub content. ", "Text");

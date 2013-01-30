@@ -802,8 +802,25 @@ public class Q implements Iterable<Element> {
         return this;
     }
 
+    /**
+     * Append the element returned from toElement to each element
+     * selected in this Q.
+     *
+     * @param toElement The element map function to obtain the element
+     * to append for each selected node.
+     * @return This Q.
+     */
     public Q append(ElementToElement toElement) throws TODO {
-        throw new TODO();
+
+        for (Element parent : this) {
+            // Copy ahead of time in case we are appending the node to the
+            // nodes being appended from.
+            Node n = document().importNode(toElement.apply(parent), true);
+            Node node = document().importNode(n, true);
+            parent.appendChild(node);
+        }
+
+        return this;
     }
 
     public Q append(ElementToQ toQ) throws TODO {

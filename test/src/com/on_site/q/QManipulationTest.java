@@ -2,6 +2,7 @@ package com.on_site.q;
 
 import static com.on_site.q.Q.$;
 
+import com.on_site.fn.ElementToElement;
 import com.on_site.fn.ElementToString;
 import com.on_site.util.TestBase;
 
@@ -85,7 +86,36 @@ public class QManipulationTest extends TestBase {
 
     @Test
     public void appendFnToElement() throws Exception {
-        // TODO
+        Q q = $("sub", $("<test><sub></sub><sub /> a <sib/> <sub>Some <i>content</i> here</sub></test>"));
+        final int[] i = { 0 };
+        q.append(new ElementToElement() {
+            @Override
+            public Element apply(Element element) {
+                i[0]++;
+                return $("<b>this is " + i[0] + " test</b>").get(0);
+            }
+        });
+        assertEquals(q.write(), "<test><sub><b>this is 1 test</b></sub><sub><b>this is 2 test</b></sub> a <sib/> <sub>Some <i>content</i> here<b>this is 3 test</b></sub></test>", "XML");
+
+        q = $("sub", $("<test><sub /> a <sib><b>with</b> stuff</sib> <sub>Some <i>content</i> here</sub></test>"));
+        final Element e1 = $("sib", q.document()).get(0);
+        q.append(new ElementToElement() {
+            @Override
+            public Element apply(Element element) {
+                return e1;
+            }
+        });
+        assertEquals(q.write(), "<test><sub><sib><b>with</b> stuff</sib></sub> a <sib><b>with</b> stuff</sib> <sub>Some <i>content</i> here<sib><b>with</b> stuff</sib></sub></test>", "XML");
+
+        q = $("sub", $("<test><sub>content</sub> <sub>simple </sub></test>"));
+        final Element e2 = $("sub:eq(0)", q.document()).get(0);
+        q.append(new ElementToElement() {
+            @Override
+            public Element apply(Element element) {
+                return e2;
+            }
+        });
+        assertEquals(q.write(), "<test><sub>content<sub>content</sub></sub> <sub>simple <sub>content<sub>content</sub></sub></sub></test>", "XML");
     }
 
     @Test

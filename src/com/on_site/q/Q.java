@@ -442,11 +442,22 @@ public class Q implements Iterable<Element> {
         public void apply(Element parent, Iterable<Node> nodes);
     }
 
-    private class ClearAppender implements NodeAppender {
+    private class AfterAppender implements NodeAppender {
         @Override
         public void apply(Element parent, Iterable<Node> nodes) {
-            parent.setTextContent("");
+            Node parentOfParent = parent.getParentNode();
+            Node next = parent.getNextSibling();
 
+            for (Node n : nodes) {
+                Node node = document().importNode(n, true);
+                parentOfParent.insertBefore(node, next);
+            }
+        }
+    }
+
+    private class AppendAppender implements NodeAppender {
+        @Override
+        public void apply(Element parent, Iterable<Node> nodes) {
             for (Node n : nodes) {
                 Node node = document().importNode(n, true);
                 parent.appendChild(node);
@@ -454,10 +465,11 @@ public class Q implements Iterable<Element> {
         }
     }
 
-
-    private class AppendAppender implements NodeAppender {
+    private class ClearAppender implements NodeAppender {
         @Override
         public void apply(Element parent, Iterable<Node> nodes) {
+            parent.setTextContent("");
+
             for (Node n : nodes) {
                 Node node = document().importNode(n, true);
                 parent.appendChild(node);
@@ -798,28 +810,28 @@ public class Q implements Iterable<Element> {
 
     // -------------- Manipulation --------------
 
-    public Q after(String xml) throws TODO {
-        throw new TODO();
+    public Q after(String xml) throws XmlException {
+        return addNodes(xml, new AfterAppender());
     }
 
-    public Q after(Element element) throws TODO {
-        throw new TODO();
+    public Q after(Element element) {
+        return addNodes(element, new AfterAppender());
     }
 
-    public Q after(Q q) throws TODO {
-        throw new TODO();
+    public Q after(Q q) {
+        return addNodes(q, new AfterAppender());
     }
 
-    public Q after(ElementToString toXml) throws TODO {
-        throw new TODO();
+    public Q after(ElementToString toXml) throws XmlException {
+        return addNodes(toXml, new AfterAppender());
     }
 
-    public Q after(ElementToElement toElement) throws TODO {
-        throw new TODO();
+    public Q after(ElementToElement toElement) {
+        return addNodes(toElement, new AfterAppender());
     }
 
-    public Q after(ElementToQ toQ) throws TODO {
-        throw new TODO();
+    public Q after(ElementToQ toQ) {
+        return addNodes(toQ, new AfterAppender());
     }
 
     /**

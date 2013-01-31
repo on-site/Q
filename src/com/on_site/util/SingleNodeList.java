@@ -34,4 +34,14 @@ public class SingleNodeList implements NodeList {
     public int getLength() {
         return 1;
     }
+
+    /**
+     * Obtain a NodeListIterable for the given single node.
+     *
+     * @param node The node to obtain an iterable for.
+     * @return An iterable for the given node.
+     */
+    public static NodeListIterable iterable(Node node) {
+        return new NodeListIterable(new SingleNodeList(node));
+    }
 }

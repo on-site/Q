@@ -438,6 +438,92 @@ public class Q implements Iterable<Element> {
 
     // -------------- Private convenience methods --------------
 
+    private static interface NodeAppender {
+        public void apply(Element parent, Iterable<Node> nodes);
+    }
+
+    private class AppendAppender implements NodeAppender {
+        @Override
+        public void apply(Element parent, Iterable<Node> nodes) {
+            for (Node n : nodes) {
+                Node node = document().importNode(n, true);
+                parent.appendChild(node);
+            }
+        }
+    }
+
+    private Q addNodes(String xml, NodeAppender appender) {
+        NodeListIterable nodes = new NodeListIterable(xmlToNodes(xml));
+
+        for (Element parent : this) {
+            appender.apply(parent, nodes);
+        }
+
+        return this;
+    }
+
+    private Q addNodes(Element element, NodeAppender appender) {
+        // Copy ahead of time in case we are appending the node to the
+        // nodes being appended from.
+        Node node = document().importNode(element, true);
+
+        for (Element parent : this) {
+            appender.apply(parent, SingleNodeList.iterable(node));
+        }
+
+        return this;
+    }
+
+    private Q addNodes(Q q, NodeAppender appender) {
+        List<Node> nodes = new LinkedList<Node>();
+
+        // Copy ahead of time in case we are appending nodes to the
+        // nodes being appended from.
+        for (Element element : q) {
+            Node node = document().importNode(element, true);
+            nodes.add(node);
+        }
+
+        for (Element parent : this) {
+            appender.apply(parent, nodes);
+        }
+
+        return this;
+    }
+
+    private Q addNodes(ElementToString toXml, NodeAppender appender) throws XmlException {
+        for (Element parent : this) {
+            appender.apply(parent, new NodeListIterable(xmlToNodes(toXml.apply(parent))));
+        }
+
+        return this;
+    }
+
+    private Q addNodes(ElementToElement toElement, NodeAppender appender) {
+        for (Element parent : this) {
+            appender.apply(parent, SingleNodeList.iterable(toElement.apply(parent)));
+        }
+
+        return this;
+    }
+
+    private Q addNodes(ElementToQ toQ, NodeAppender appender) {
+        for (Element parent : this) {
+            List<Node> nodes = new LinkedList<Node>();
+
+            // Copy ahead of time in case we are appending nodes to the
+            // nodes being appended from.
+            for (Element element : toQ.apply(parent)) {
+                Node node = document().importNode(element, true);
+                nodes.add(node);
+            }
+
+            appender.apply(parent, nodes);
+        }
+
+        return this;
+    }
+
     private static Element[] asArray(Element element) {
         if (element == null) {
             return new Element[0];
@@ -721,16 +807,7 @@ public class Q implements Iterable<Element> {
      * appending it to each element.
      */
     public Q append(String xml) throws XmlException {
-        NodeList nodes = xmlToNodes(xml);
-
-        for (Element parent : this) {
-            for (Node n : new NodeListIterable(nodes)) {
-                Node node = document().importNode(n, true);
-                parent.appendChild(node);
-            }
-        }
-
-        return this;
+        return addNodes(xml, new AppendAppender());
     }
 
     /**
@@ -740,16 +817,7 @@ public class Q implements Iterable<Element> {
      * @return This Q.
      */
     public Q append(Element element) {
-        // Copy ahead of time in case we are appending the node to the
-        // nodes being appended from.
-        Node n = document().importNode(element, true);
-
-        for (Element parent : this) {
-            Node node = document().importNode(n, true);
-            parent.appendChild(node);
-        }
-
-        return this;
+        return addNodes(element, new AppendAppender());
     }
 
     /**
@@ -760,23 +828,7 @@ public class Q implements Iterable<Element> {
      * @return This Q.
      */
     public Q append(Q q) {
-        List<Node> nodes = new LinkedList<Node>();
-
-        // Copy ahead of time in case we are appending nodes to the
-        // nodes being appended from.
-        for (Element element : q) {
-            Node node = document().importNode(element, true);
-            nodes.add(node);
-        }
-
-        for (Element parent : this) {
-            for (Node n : nodes) {
-                Node node = document().importNode(n, true);
-                parent.appendChild(node);
-            }
-        }
-
-        return this;
+        return addNodes(q, new AppendAppender());
     }
 
     /**
@@ -790,16 +842,7 @@ public class Q implements Iterable<Element> {
      * appending it to each element.
      */
     public Q append(ElementToString toXml) throws XmlException {
-        for (Element parent : this) {
-            NodeList nodes = xmlToNodes(toXml.apply(parent));
-
-            for (Node n : new NodeListIterable(nodes)) {
-                Node node = document().importNode(n, true);
-                parent.appendChild(node);
-            }
-        }
-
-        return this;
+        return addNodes(toXml, new AppendAppender());
     }
 
     /**
@@ -811,15 +854,7 @@ public class Q implements Iterable<Element> {
      * @return This Q.
      */
     public Q append(ElementToElement toElement) {
-        for (Element parent : this) {
-            // Copy ahead of time in case we are appending the node to the
-            // nodes being appended from.
-            Node n = document().importNode(toElement.apply(parent), true);
-            Node node = document().importNode(n, true);
-            parent.appendChild(node);
-        }
-
-        return this;
+        return addNodes(toElement, new AppendAppender());
     }
 
     /**
@@ -831,23 +866,7 @@ public class Q implements Iterable<Element> {
      * @return This Q.
      */
     public Q append(ElementToQ toQ) {
-        for (Element parent : this) {
-            List<Node> nodes = new LinkedList<Node>();
-
-            // Copy ahead of time in case we are appending nodes to the
-            // nodes being appended from.
-            for (Element element : toQ.apply(parent)) {
-                Node node = document().importNode(element, true);
-                nodes.add(node);
-            }
-
-            for (Node n : nodes) {
-                Node node = document().importNode(n, true);
-                parent.appendChild(node);
-            }
-        }
-
-        return this;
+        return addNodes(toQ, new AppendAppender());
     }
 
     public Q appendTo(String xml) throws TODO {

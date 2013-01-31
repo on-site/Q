@@ -810,26 +810,74 @@ public class Q implements Iterable<Element> {
 
     // -------------- Manipulation --------------
 
+    /**
+     * Append the given xml content after each element selected in
+     * this Q.
+     *
+     * @param xml The xml toadd after each node selected.
+     * @return This Q.
+     * @throws XmlException If there is a problem parsing the xml or
+     * appending it after each element.
+     */
     public Q after(String xml) throws XmlException {
         return addNodes(xml, new AfterAppender());
     }
 
+    /**
+     * Append the element to each element selected in this Q.
+     *
+     * @param element The element to append to each node selected.
+     * @return This Q.
+     */
     public Q after(Element element) {
         return addNodes(element, new AfterAppender());
     }
 
+    /**
+     * Append each element selected in q after each element selected
+     * in this Q.
+     *
+     * @param q The elements to append after to each node selected.
+     * @return This Q.
+     */
     public Q after(Q q) {
         return addNodes(q, new AfterAppender());
     }
 
+    /**
+     * Append the xml content returned from toXml after each element
+     * selected in this Q into each element.
+     *
+     * @param toXml The xml map function to obtain the xml to append
+     * after each node selected.
+     * @return This Q.
+     * @throws XmlException If there is a problem parsing the xml or
+     * appending it after each element.
+     */
     public Q after(ElementToString toXml) throws XmlException {
         return addNodes(toXml, new AfterAppender());
     }
 
+    /**
+     * Append the element returned from toElement after each element
+     * selected in this Q.
+     *
+     * @param toElement The element map function to obtain the element
+     * to append after each selected node.
+     * @return This Q.
+     */
     public Q after(ElementToElement toElement) {
         return addNodes(toElement, new AfterAppender());
     }
 
+    /**
+     * Append the elements selected that are returned from toQ after
+     * each element selected in this Q.
+     *
+     * @param toQ The element map function to obtain the list of
+     * elements to append after each selected node.
+     * @return This Q.
+     */
     public Q after(ElementToQ toQ) {
         return addNodes(toQ, new AfterAppender());
     }

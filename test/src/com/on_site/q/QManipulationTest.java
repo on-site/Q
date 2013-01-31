@@ -163,6 +163,157 @@ public class QManipulationTest extends TestBase {
     }
 
     @Test
+    public void prependXml() throws Exception {
+        Q q = $("sub", $("<test><sub></sub><sub /> a <sib/> <sub>Some <i>content</i> here</sub></test>"));
+        q.prepend("<b>this is a test</b>");
+        assertEquals(q.write(), "<test><sub><b>this is a test</b></sub><sub><b>this is a test</b></sub> a <sib/> <sub><b>this is a test</b>Some <i>content</i> here</sub></test>", "XML");
+
+        q = $("sub", $("<test><sub>one</sub> <sub>two</sub></test>"));
+        q.prepend("<three>four</three> and <five/>");
+        assertEquals(q.write(), "<test><sub><three>four</three> and <five/>one</sub> <sub><three>four</three> and <five/>two</sub></test>", "XML");
+    }
+
+    @Test
+    public void prependElement() throws Exception {
+        Q q = $("sub", $("<test><sub></sub><sub /> a <sib/> <sub>Some <i>content</i> here</sub></test>"));
+        q.prepend($("<b>this is a test</b>").get(0));
+        assertEquals(q.write(), "<test><sub><b>this is a test</b></sub><sub><b>this is a test</b></sub> a <sib/> <sub><b>this is a test</b>Some <i>content</i> here</sub></test>", "XML");
+
+        q = $("sub", $("<test><sub /> a <sib><b>with</b> stuff</sib> <sub>Some <i>content</i> here</sub></test>"));
+        q.prepend($("sib", q.document()).get(0));
+        assertEquals(q.write(), "<test><sub><sib><b>with</b> stuff</sib></sub> a <sib><b>with</b> stuff</sib> <sub><sib><b>with</b> stuff</sib>Some <i>content</i> here</sub></test>", "XML");
+
+        q = $("sub", $("<test><sub>content</sub> <sub>simple </sub></test>"));
+        q.prepend($("sub:eq(0)", q.document()).get(0));
+        assertEquals(q.write(), "<test><sub><sub>content</sub>content</sub> <sub><sub>content</sub>simple </sub></test>", "XML");
+    }
+
+    @Test
+    public void prependQ() throws Exception {
+        Q q = $("sub", $("<test><sub></sub><sub /> a <sib/> <sub>Some <i>content</i> here</sub></test>"));
+        q.prepend($("<b>this is a test</b>"));
+        assertEquals(q.write(), "<test><sub><b>this is a test</b></sub><sub><b>this is a test</b></sub> a <sib/> <sub><b>this is a test</b>Some <i>content</i> here</sub></test>", "XML");
+
+        q = $("sub", $("<test><sub /> a <sib><b>with</b> stuff</sib> <sub>Some <i>content</i> here</sub></test>"));
+        q.prepend($("sib", q.document()));
+        assertEquals(q.write(), "<test><sub><sib><b>with</b> stuff</sib></sub> a <sib><b>with</b> stuff</sib> <sub><sib><b>with</b> stuff</sib>Some <i>content</i> here</sub></test>", "XML");
+
+        q = $("sub", $("<test><sub>content</sub> <sub>simple </sub></test>"));
+        q.prepend($("sub:eq(0)", q.document()));
+        assertEquals(q.write(), "<test><sub><sub>content</sub>content</sub> <sub><sub>content</sub>simple </sub></test>", "XML");
+
+        q = $("sub", $("<test><sub>one</sub> <sub>two</sub></test>"));
+        q.prepend($("<three>four</three> and <five/>"));
+        assertEquals(q.write(), "<test><sub><three>four</three><five/>one</sub> <sub><three>four</three><five/>two</sub></test>", "XML");
+    }
+
+    @Test
+    public void prependFnToXml() throws Exception {
+        Q q = $("sub", $("<test><sub></sub><sub /> a <sib/> <sub>Some <i>content</i> here</sub></test>"));
+        final int[] i = { 0 };
+
+        q.prepend(new ElementToString() {
+            @Override
+            public String apply(Element element) {
+                i[0]++;
+                return "<b>this is " + i[0] + " test</b>";
+            }
+        });
+
+        assertEquals(q.write(), "<test><sub><b>this is 1 test</b></sub><sub><b>this is 2 test</b></sub> a <sib/> <sub><b>this is 3 test</b>Some <i>content</i> here</sub></test>", "XML");
+
+        q = $("sub", $("<test><sub>one</sub> <sub>two</sub></test>"));
+        i[0] = 0;
+
+        q.prepend(new ElementToString() {
+            @Override
+            public String apply(Element element) {
+                i[0]++;
+                return "<three>four</three> " + i[0] + " and <five/>";
+            }
+        });
+
+        assertEquals(q.write(), "<test><sub><three>four</three> 1 and <five/>one</sub> <sub><three>four</three> 2 and <five/>two</sub></test>", "XML");
+    }
+
+    @Test
+    public void prependFnToElement() throws Exception {
+        Q q = $("sub", $("<test><sub></sub><sub /> a <sib/> <sub>Some <i>content</i> here</sub></test>"));
+        final int[] i = { 0 };
+        q.prepend(new ElementToElement() {
+            @Override
+            public Element apply(Element element) {
+                i[0]++;
+                return $("<b>this is " + i[0] + " test</b>").get(0);
+            }
+        });
+        assertEquals(q.write(), "<test><sub><b>this is 1 test</b></sub><sub><b>this is 2 test</b></sub> a <sib/> <sub><b>this is 3 test</b>Some <i>content</i> here</sub></test>", "XML");
+
+        q = $("sub", $("<test><sub /> a <sib><b>with</b> stuff</sib> <sub>Some <i>content</i> here</sub></test>"));
+        final Element e1 = $("sib", q.document()).get(0);
+        q.prepend(new ElementToElement() {
+            @Override
+            public Element apply(Element element) {
+                return e1;
+            }
+        });
+        assertEquals(q.write(), "<test><sub><sib><b>with</b> stuff</sib></sub> a <sib><b>with</b> stuff</sib> <sub><sib><b>with</b> stuff</sib>Some <i>content</i> here</sub></test>", "XML");
+
+        q = $("sub", $("<test><sub>content</sub> <sub>simple </sub></test>"));
+        final Element e2 = $("sub:eq(0)", q.document()).get(0);
+        q.prepend(new ElementToElement() {
+            @Override
+            public Element apply(Element element) {
+                return e2;
+            }
+        });
+        assertEquals(q.write(), "<test><sub><sub>content</sub>content</sub> <sub><sub><sub>content</sub>content</sub>simple </sub></test>", "XML");
+    }
+
+    @Test
+    public void prependFnToQ() throws Exception {
+        Q q = $("sub", $("<test><sub></sub><sub /> a <sib/> <sub>Some <i>content</i> here</sub></test>"));
+        final Q q1 = $("<b>this is a test</b>");
+        q.prepend(new ElementToQ() {
+            @Override
+            public Q apply(Element element) {
+                return q1;
+            }
+        });
+        assertEquals(q.write(), "<test><sub><b>this is a test</b></sub><sub><b>this is a test</b></sub> a <sib/> <sub><b>this is a test</b>Some <i>content</i> here</sub></test>", "XML");
+
+        q = $("sub", $("<test><sub /> a <sib><b>with</b> stuff</sib> <sub>Some <i>content</i> here</sub></test>"));
+        final Q q2 = $("sib", q.document());
+        q.prepend(new ElementToQ() {
+            @Override
+            public Q apply(Element element) {
+                return q2;
+            }
+        });
+        assertEquals(q.write(), "<test><sub><sib><b>with</b> stuff</sib></sub> a <sib><b>with</b> stuff</sib> <sub><sib><b>with</b> stuff</sib>Some <i>content</i> here</sub></test>", "XML");
+
+        q = $("sub", $("<test><sub>content</sub> <sub>simple </sub></test>"));
+        final Q q3 = $("sub:eq(0)", q.document());
+        q.prepend(new ElementToQ() {
+            @Override
+            public Q apply(Element element) {
+                return q3;
+            }
+        });
+        assertEquals(q.write(), "<test><sub><sub>content</sub>content</sub> <sub><sub><sub>content</sub>content</sub>simple </sub></test>", "XML");
+
+        q = $("sub", $("<test><sub>one</sub> <sub>two</sub></test>"));
+        final Q q4 = $("<three>four</three> and <five/>");
+        q.prepend(new ElementToQ() {
+            @Override
+            public Q apply(Element element) {
+                return q4;
+            }
+        });
+        assertEquals(q.write(), "<test><sub><three>four</three><five/>one</sub> <sub><three>four</three><five/>two</sub></test>", "XML");
+    }
+
+    @Test
     public void text() throws Exception {
         Q q = $("sub", $("<test><sub>Content <b>with some</b> sub content. <endingTag value=\"something\"/></sub><sub>content</sub><sub /></test>"));
         assertEquals(q.text(), "Content with some sub content. ", "Text");

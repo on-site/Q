@@ -442,12 +442,37 @@ public class Q implements Iterable<Element> {
         public void apply(Element parent, Iterable<Node> nodes);
     }
 
+    private class ClearAppender implements NodeAppender {
+        @Override
+        public void apply(Element parent, Iterable<Node> nodes) {
+            parent.setTextContent("");
+
+            for (Node n : nodes) {
+                Node node = document().importNode(n, true);
+                parent.appendChild(node);
+            }
+        }
+    }
+
+
     private class AppendAppender implements NodeAppender {
         @Override
         public void apply(Element parent, Iterable<Node> nodes) {
             for (Node n : nodes) {
                 Node node = document().importNode(n, true);
                 parent.appendChild(node);
+            }
+        }
+    }
+
+    private class PrependAppender implements NodeAppender {
+        @Override
+        public void apply(Element parent, Iterable<Node> nodes) {
+            Node reference = parent.getFirstChild();
+
+            for (Node n : nodes) {
+                Node node = document().importNode(n, true);
+                parent.insertBefore(node, reference);
             }
         }
     }
@@ -906,6 +931,78 @@ public class Q implements Iterable<Element> {
     }
 
     /**
+     * Prepend the given xml content into each element selected in this
+     * Q.
+     *
+     * @param xml The xml to prepend to each node selected.
+     * @return This Q.
+     * @throws XmlException If there is a problem parsing the xml or
+     * prepending it to each element.
+     */
+    public Q prepend(String xml) throws XmlException {
+        return addNodes(xml, new PrependAppender());
+    }
+
+    /**
+     * Prepend the element to each element selected in this Q.
+     *
+     * @param element The element to prepend to each node selected.
+     * @return This Q.
+     */
+    public Q prepend(Element element) {
+        return addNodes(element, new PrependAppender());
+    }
+
+    /**
+     * Prepend each element selected in q to each element selected in
+     * this Q.
+     *
+     * @param q The elements to prepend in to each node selected.
+     * @return This Q.
+     */
+    public Q prepend(Q q) {
+        return addNodes(q, new PrependAppender());
+    }
+
+    /**
+     * Prepend the xml content returned from toXml invoked with each
+     * element selected in this Q into each element.
+     *
+     * @param toXml The xml map function to obtain the xml to prepend
+     * to each node selected.
+     * @return This Q.
+     * @throws XmlException If there is a problem parsing the xml or
+     * prepending it to each element.
+     */
+    public Q prepend(ElementToString toXml) throws XmlException {
+        return addNodes(toXml, new PrependAppender());
+    }
+
+    /**
+     * Prepend the element returned from toElement to each element
+     * selected in this Q.
+     *
+     * @param toElement The element map function to obtain the element
+     * to prepend for each selected node.
+     * @return This Q.
+     */
+    public Q prepend(ElementToElement toElement) {
+        return addNodes(toElement, new PrependAppender());
+    }
+
+    /**
+     * Prepend the elements selected that are returned from toQ to each
+     * element selected in this Q.
+     *
+     * @param toQ The element map function to obtain the list of
+     * elements to prepend for each selected node.
+     * @return This Q.
+     */
+    public Q prepend(ElementToQ toQ) {
+        return addNodes(toQ, new PrependAppender());
+    }
+
+    /**
      * Retrieve the text for the first selected element as a string.
      * The text will not include any xml nodes.  If there are no
      * elements selected, null is returned.  If the element has no
@@ -1012,18 +1109,7 @@ public class Q implements Iterable<Element> {
      * inserting it into each element.
      */
     public Q xml(String xml) throws XmlException {
-        NodeList nodes = xmlToNodes(xml);
-
-        for (Element element : this) {
-            element.setTextContent("");
-
-            for (Node n : new NodeListIterable(nodes)) {
-                Node node = document().importNode(n, true);
-                element.appendChild(node);
-            }
-        }
-
-        return this;
+        return addNodes(xml, new ClearAppender());
     }
 
     /**
@@ -1041,29 +1127,7 @@ public class Q implements Iterable<Element> {
      * inserting it into each element.
      */
     public Q xml(ElementToString map) throws XmlException {
-        try {
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-
-            for (Element element : this) {
-                String xml = map.apply(element);
-                Document document = builder.parse(new InputSource(new StringReader("<root>" + xml + "</root>")));
-                NodeList nodes = document.getDocumentElement().getChildNodes();
-                element.setTextContent("");
-
-                for (Node n : new NodeListIterable(nodes)) {
-                    Node node = document().importNode(n, true);
-                    element.appendChild(node);
-                }
-            }
-        } catch (IOException e) {
-            throw new XmlException(e);
-        } catch (ParserConfigurationException e) {
-            throw new XmlException(e);
-        } catch (SAXException e) {
-            throw new XmlException(e);
-        }
-
-        return this;
+        return addNodes(map, new ClearAppender());
     }
 
     // -------------- Miscellaneous --------------

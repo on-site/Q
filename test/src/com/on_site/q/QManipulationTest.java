@@ -3,6 +3,7 @@ package com.on_site.q;
 import static com.on_site.q.Q.$;
 
 import com.on_site.fn.ElementToElement;
+import com.on_site.fn.ElementToQ;
 import com.on_site.fn.ElementToString;
 import com.on_site.util.TestBase;
 
@@ -120,7 +121,45 @@ public class QManipulationTest extends TestBase {
 
     @Test
     public void appendFnToQ() throws Exception {
-        // TODO
+        Q q = $("sub", $("<test><sub></sub><sub /> a <sib/> <sub>Some <i>content</i> here</sub></test>"));
+        final Q q1 = $("<b>this is a test</b>");
+        q.append(new ElementToQ() {
+            @Override
+            public Q apply(Element element) {
+                return q1;
+            }
+        });
+        assertEquals(q.write(), "<test><sub><b>this is a test</b></sub><sub><b>this is a test</b></sub> a <sib/> <sub>Some <i>content</i> here<b>this is a test</b></sub></test>", "XML");
+
+        q = $("sub", $("<test><sub /> a <sib><b>with</b> stuff</sib> <sub>Some <i>content</i> here</sub></test>"));
+        final Q q2 = $("sib", q.document());
+        q.append(new ElementToQ() {
+            @Override
+            public Q apply(Element element) {
+                return q2;
+            }
+        });
+        assertEquals(q.write(), "<test><sub><sib><b>with</b> stuff</sib></sub> a <sib><b>with</b> stuff</sib> <sub>Some <i>content</i> here<sib><b>with</b> stuff</sib></sub></test>", "XML");
+
+        q = $("sub", $("<test><sub>content</sub> <sub>simple </sub></test>"));
+        final Q q3 = $("sub:eq(0)", q.document());
+        q.append(new ElementToQ() {
+            @Override
+            public Q apply(Element element) {
+                return q3;
+            }
+        });
+        assertEquals(q.write(), "<test><sub>content<sub>content</sub></sub> <sub>simple <sub>content<sub>content</sub></sub></sub></test>", "XML");
+
+        q = $("sub", $("<test><sub>one</sub> <sub>two</sub></test>"));
+        final Q q4 = $("<three>four</three> and <five/>");
+        q.append(new ElementToQ() {
+            @Override
+            public Q apply(Element element) {
+                return q4;
+            }
+        });
+        assertEquals(q.write(), "<test><sub>one<three>four</three><five/></sub> <sub>two<three>four</three><five/></sub></test>", "XML");
     }
 
     @Test

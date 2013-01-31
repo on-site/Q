@@ -810,8 +810,7 @@ public class Q implements Iterable<Element> {
      * to append for each selected node.
      * @return This Q.
      */
-    public Q append(ElementToElement toElement) throws TODO {
-
+    public Q append(ElementToElement toElement) {
         for (Element parent : this) {
             // Copy ahead of time in case we are appending the node to the
             // nodes being appended from.
@@ -823,8 +822,32 @@ public class Q implements Iterable<Element> {
         return this;
     }
 
-    public Q append(ElementToQ toQ) throws TODO {
-        throw new TODO();
+    /**
+     * Append the elements selected that are returned from toQ to each
+     * element selected in this Q.
+     *
+     * @param toQ The element map function to obtain the list of
+     * elements to append for each selected node.
+     * @return This Q.
+     */
+    public Q append(ElementToQ toQ) {
+        for (Element parent : this) {
+            List<Node> nodes = new LinkedList<Node>();
+
+            // Copy ahead of time in case we are appending nodes to the
+            // nodes being appended from.
+            for (Element element : toQ.apply(parent)) {
+                Node node = document().importNode(element, true);
+                nodes.add(node);
+            }
+
+            for (Node n : nodes) {
+                Node node = document().importNode(n, true);
+                parent.appendChild(node);
+            }
+        }
+
+        return this;
     }
 
     public Q appendTo(String xml) throws TODO {

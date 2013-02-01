@@ -465,6 +465,18 @@ public class Q implements Iterable<Element> {
         }
     }
 
+    private class BeforeAppender implements NodeAppender {
+        @Override
+        public void apply(Element parent, Iterable<Node> nodes) {
+            Node parentOfParent = parent.getParentNode();
+
+            for (Node n : nodes) {
+                Node node = document().importNode(n, true);
+                parentOfParent.insertBefore(node, parent);
+            }
+        }
+    }
+
     private class ClearAppender implements NodeAppender {
         @Override
         public void apply(Element parent, Iterable<Node> nodes) {
@@ -966,28 +978,76 @@ public class Q implements Iterable<Element> {
         throw new TODO();
     }
 
-    public Q before(String xml) throws TODO {
-        throw new TODO();
+    /**
+     * Append the given xml content before each element selected in
+     * this Q.
+     *
+     * @param xml The xml toadd before each node selected.
+     * @return This Q.
+     * @throws XmlException If there is a problem parsing the xml or
+     * appending it before each element.
+     */
+    public Q before(String xml)throws XmlException {
+        return addNodes(xml, new BeforeAppender());
     }
 
-    public Q before(Element element) throws TODO {
-        throw new TODO();
+    /**
+     * Append the element to each element selected in this Q.
+     *
+     * @param element The element to append to each node selected.
+     * @return This Q.
+     */
+    public Q before(Element element) {
+        return addNodes(element, new BeforeAppender());
     }
 
-    public Q before(Q q) throws TODO {
-        throw new TODO();
+    /**
+     * Append each element selected in q before each element selected
+     * in this Q.
+     *
+     * @param q The elements to append before to each node selected.
+     * @return This Q.
+     */
+    public Q before(Q q) {
+        return addNodes(q, new BeforeAppender());
     }
 
-    public Q before(ElementToString toXml) throws TODO {
-        throw new TODO();
+    /**
+     * Append the xml content returned from toXml before each element
+     * selected in this Q into each element.
+     *
+     * @param toXml The xml map function to obtain the xml to append
+     * before each node selected.
+     * @return This Q.
+     * @throws XmlException If there is a problem parsing the xml or
+     * appending it before each element.
+     */
+    public Q before(ElementToString toXml) throws XmlException {
+        return addNodes(toXml, new BeforeAppender());
     }
 
-    public Q before(ElementToElement toElement) throws TODO {
-        throw new TODO();
+    /**
+     * Append the element returned from toElement before each element
+     * selected in this Q.
+     *
+     * @param toElement The element map function to obtain the element
+     * to append before each selected node.
+     * @return This Q.
+     */
+    public Q before(ElementToElement toElement) {
+        return addNodes(toElement, new BeforeAppender());
     }
 
-    public Q before(ElementToQ toQ) throws TODO {
-        throw new TODO();
+    /**
+     * Append the elements selected that are returned from toQ before
+     * each element selected in this Q.
+     *
+     * @param toQ The element map function to obtain the list of
+     * elements to append before each selected node.
+     * @return This Q.
+     */
+    public Q before(ElementToQ toQ) {
+        return addNodes(toQ, new BeforeAppender());
     }
 
     /**

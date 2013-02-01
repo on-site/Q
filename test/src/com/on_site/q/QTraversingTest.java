@@ -3,6 +3,8 @@ package com.on_site.q;
 import static com.on_site.q.Q.$;
 
 import com.on_site.fn.ElementPredicate;
+import com.on_site.fn.ElementToElement;
+import com.on_site.fn.ElementToElements;
 import com.on_site.util.TestBase;
 
 import org.testng.annotations.Test;
@@ -46,6 +48,12 @@ public class QTraversingTest extends TestBase {
         assertEquals(q.first().end(), q, "The resulting Q");
         assertEquals(q.has("sub").end(), q, "The resulting Q");
         assertEquals(q.last().end(), q, "The resulting Q");
+        assertEquals(q.map(new ElementToElement() {
+            @Override
+            public Element apply(Element element) {
+                return element;
+            }
+        }).end(), q, "The resulting Q");
         assertEquals(q.next().end(), q, "The resulting Q");
         assertEquals(q.nextAll().end(), q, "The resulting Q");
         assertEquals(q.prev().end(), q, "The resulting Q");
@@ -208,10 +216,78 @@ public class QTraversingTest extends TestBase {
 
     @Test
     public void last() throws Exception {
-        Q q = $("sub", document("<test><sub/><sub>content</sub></test>"));
+        Q q = $("sub", $("<test><sub/><sub>content</sub></test>"));
         assertEquals(q.last().size(), 1, "Size");
         assertEquals(q.last().get(0), q.get(1), "Selected item");
         assertEquals(q.last().last().get(0), q.get(1), "Selected item");
+    }
+
+    @Test
+    public void mapToElement() throws Exception {
+        Q q = $("<test><sub><sib/><sib/></sub> <sub/> <sub><sib/></sub></test>");
+        final Q sibs = q.find("sib");
+        Q mapped = q.find("sub").map(new ElementToElement() {
+            @Override
+            public Element apply(Element element) {
+                return $(element).find("sib").get(0);
+            }
+        });
+        assertEquals(mapped.size(), 2, "Size");
+        assertEquals(mapped.get(0), sibs.get(0), "Element");
+        assertEquals(mapped.get(1), sibs.get(2), "Element");
+
+        mapped = q.find("sub").map(new ElementToElement() {
+            @Override
+            public Element apply(Element element) {
+                return sibs.get(0);
+            }
+        });
+        assertEquals(mapped.size(), 1, "Size");
+        assertEquals(mapped.get(0), sibs.get(0), "Element");
+    }
+
+    @Test
+    public void mapToElements() throws Exception {
+        Q q = $("<test><sub><sib/><sib/></sub> <sub/> <sub><sib/></sub></test>");
+        final Q sibs = q.find("sib");
+        Q mapped = q.find("sub").map(new ElementToElements() {
+            @Override
+            public Element[] apply(Element element) {
+                return $(element).find("sib").get();
+            }
+        });
+        assertEquals(mapped.size(), 3, "Size");
+        assertEquals(mapped.get(0), sibs.get(0), "Element");
+        assertEquals(mapped.get(1), sibs.get(1), "Element");
+        assertEquals(mapped.get(2), sibs.get(2), "Element");
+
+        mapped = q.find("sub").map(new ElementToElements() {
+            @Override
+            public Element[] apply(Element element) {
+                return new Element[] { sibs.get(0), null, sibs.get(1) };
+            }
+        });
+        assertEquals(mapped.size(), 2, "Size");
+        assertEquals(mapped.get(0), sibs.get(0), "Element");
+        assertEquals(mapped.get(1), sibs.get(1), "Element");
+
+        mapped = q.find("sub").map(new ElementToElements() {
+            @Override
+            public Element[] apply(Element element) {
+                return null;
+            }
+        });
+        assertEquals(mapped.size(), 0, "Size");
+    }
+
+    @Test
+    public void mapToQ() throws Exception {
+        // TODO
+    }
+
+    @Test
+    public void mapToGeneric() throws Exception {
+        // TODO
     }
 
     @Test

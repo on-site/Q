@@ -1733,19 +1733,64 @@ public class Q implements Iterable<Element> {
         return eq(-1);
     }
 
-    public Q map(ElementToElement toElement) throws TODO {
-        throw new TODO();
+    /**
+     * Map each element to a new set of elements.  If the result of
+     * any given apply is null, it will be ignored.  Matching elements
+     * are dropped from the resulting Q.
+     *
+     * @param toElement A mapping function to the elements to load.
+     * @return A Q with all the original elements mapped to something
+     * new.
+     */
+    public Q map(ElementToElement toElement) {
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element context : this) {
+            Element element = toElement.apply(context);
+
+            if (element != null) {
+                result.add(element);
+            }
+        }
+
+        return $select(result);
     }
 
-    public Q map(ElementToElements toElements) throws TODO {
-        throw new TODO();
+    /**
+     * Map each element to a new set of elements.  If the result of
+     * any given apply is null, it will be ignored.  Matching elements
+     * are dropped from the resulting Q.
+     *
+     * @param toElement A mapping function to none or more elements to
+     * load.
+     * @return A Q with all the original elements mapped to something
+     * new.
+     */
+    public Q map(ElementToElements toElements) {
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element context : this) {
+            Element[] elements = toElements.apply(context);
+
+            if (elements == null) {
+                continue;
+            }
+
+            for (Element element : elements) {
+                if (element != null) {
+                    result.add(element);
+                }
+            }
+        }
+
+        return $select(result);
     }
 
     public Q map(ElementToQ toQ) throws TODO {
         throw new TODO();
     }
 
-    public <T> List<T> map(ElementToGeneric map) throws TODO {
+    public <T> List<T> map(ElementToGeneric<T> map) throws TODO {
         throw new TODO();
     }
 

@@ -1050,6 +1050,12 @@ public class Q implements Iterable<Element> {
         return addNodes(toQ, new BeforeAppender());
     }
 
+    // clone
+    // detach
+    // empty
+    // insertAfter
+    // insertBefore
+
     /**
      * Prepend the given xml content into each element selected in this
      * Q.
@@ -1122,6 +1128,11 @@ public class Q implements Iterable<Element> {
         return addNodes(toQ, new PrependAppender());
     }
 
+    // prependTo
+    // remove
+    // replaceAll
+    // replaceWith
+
     /**
      * Retrieve the text for the first selected element as a string.
      * The text will not include any xml nodes.  If there are no
@@ -1192,6 +1203,11 @@ public class Q implements Iterable<Element> {
 
         return this;
     }
+
+    // unwrap
+    // wrap
+    // wrapAll
+    // wrapInner
 
     /**
      * Retrieve the xml for the first selected element as a string

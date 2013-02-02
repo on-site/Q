@@ -1786,8 +1786,32 @@ public class Q implements Iterable<Element> {
         return $select(result);
     }
 
-    public Q map(ElementToQ toQ) throws TODO {
-        throw new TODO();
+    /**
+     * Map each element to a Q of elements.  If the result of any
+     * given apply is null, it will be ignored.  Matching elements are
+     * dropped from the resulting Q.
+     *
+     * @param toQ A mapping function to none or more elements selected
+     * in a Q to load.
+     * @return A Q with all the original elements mapped to something
+     * new.
+     */
+    public Q map(ElementToQ toQ) {
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element context : this) {
+            Q q = toQ.apply(context);
+
+            if (q == null) {
+                continue;
+            }
+
+            for (Element element : q) {
+                result.add(element);
+            }
+        }
+
+        return $select(result);
     }
 
     public <T> List<T> map(ElementToGeneric<T> map) throws TODO {

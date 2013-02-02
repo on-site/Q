@@ -5,6 +5,7 @@ import static com.on_site.q.Q.$;
 import com.on_site.fn.ElementPredicate;
 import com.on_site.fn.ElementToElement;
 import com.on_site.fn.ElementToElements;
+import com.on_site.fn.ElementToQ;
 import com.on_site.util.TestBase;
 
 import org.testng.annotations.Test;
@@ -282,7 +283,44 @@ public class QTraversingTest extends TestBase {
 
     @Test
     public void mapToQ() throws Exception {
-        // TODO
+        Q q = $("<test><sub><sib/><sib/><foo/></sub> <sub/> <sub><bar/><sib/></sub></test>");
+        final Q sibs = q.find("sib");
+        Q mapped = q.find("sub").map(new ElementToQ() {
+            @Override
+            public Q apply(Element element) {
+                return $(element).find("sib");
+            }
+        });
+        assertEquals(mapped.size(), 3, "Size");
+        assertEquals(mapped.get(0), sibs.get(0), "Element");
+        assertEquals(mapped.get(1), sibs.get(1), "Element");
+        assertEquals(mapped.get(2), sibs.get(2), "Element");
+
+        mapped = q.find("sub").map(new ElementToQ() {
+            @Override
+            public Q apply(Element element) {
+                return $(new Element[] { sibs.get(0), sibs.get(1) });
+            }
+        });
+        assertEquals(mapped.size(), 2, "Size");
+        assertEquals(mapped.get(0), sibs.get(0), "Element");
+        assertEquals(mapped.get(1), sibs.get(1), "Element");
+
+        mapped = q.find("sub").map(new ElementToQ() {
+            @Override
+            public Q apply(Element element) {
+                return $();
+            }
+        });
+        assertEquals(mapped.size(), 0, "Size");
+
+        mapped = q.find("sub").map(new ElementToQ() {
+            @Override
+            public Q apply(Element element) {
+                return null;
+            }
+        });
+        assertEquals(mapped.size(), 0, "Size");
     }
 
     @Test

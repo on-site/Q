@@ -5,8 +5,11 @@ import static com.on_site.q.Q.$;
 import com.on_site.fn.ElementPredicate;
 import com.on_site.fn.ElementToElement;
 import com.on_site.fn.ElementToElements;
+import com.on_site.fn.ElementToGeneric;
 import com.on_site.fn.ElementToQ;
 import com.on_site.util.TestBase;
+
+import java.util.List;
 
 import org.testng.annotations.Test;
 import org.w3c.dom.Element;
@@ -325,7 +328,35 @@ public class QTraversingTest extends TestBase {
 
     @Test
     public void mapToGeneric() throws Exception {
-        // TODO
+        Q q = $("<test><sub id='1'><foo/></sub> <sub id='2'/> <sub id='3'><bar/><sib/></sub></test>");
+        final Q sibs = q.find("sib");
+        List<String> mapped = q.find("sub").map(new ElementToGeneric<String>() {
+            @Override
+            public String apply(Element element) {
+                return $(element).attr("id");
+            }
+        });
+        assertEquals(mapped.size(), 3, "Size");
+        assertEquals(mapped.get(0), "1", "Item");
+        assertEquals(mapped.get(1), "2", "Item");
+        assertEquals(mapped.get(2), "3", "Item");
+
+        mapped = q.find("sub").map(new ElementToGeneric<String>() {
+            @Override
+            public String apply(Element element) {
+                String id = $(element).attr("id");
+
+                if (id.equals("2")) {
+                    return null;
+                }
+
+                return id;
+            }
+        });
+        assertEquals(mapped.size(), 3, "Size");
+        assertEquals(mapped.get(0), "1", "Item");
+        assertEquals(mapped.get(1), null, "Item");
+        assertEquals(mapped.get(2), "3", "Item");
     }
 
     @Test

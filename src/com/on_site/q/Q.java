@@ -32,6 +32,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -1814,8 +1815,20 @@ public class Q implements Iterable<Element> {
         return $select(result);
     }
 
-    public <T> List<T> map(ElementToGeneric<T> map) throws TODO {
-        throw new TODO();
+    /**
+     * Map each element to a new object of the generic type.
+     *
+     * @param map A mapping function to load the resulting list with.
+     * @return A list of objects mapped from the selected elements.
+     */
+    public <T> List<T> map(ElementToGeneric<T> map) {
+        List<T> result = new ArrayList<T>(size());
+
+        for (Element context : this) {
+            result.add(map.apply(context));
+        }
+
+        return result;
     }
 
     /**

@@ -3,6 +3,7 @@ package com.on_site.q;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
@@ -52,6 +53,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DOMError;
+import org.w3c.dom.DOMErrorHandler;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -147,6 +150,14 @@ public class Q implements Iterable<Element> {
         this(file, null, null, true);
     }
 
+    private static class IgnoredErrorHandler implements DOMErrorHandler {
+        public boolean handleError(DOMError error) {
+            return true;
+        }
+    }
+
+    private static final DOMErrorHandler IGNORED_ERROR_HANDLER = new IgnoredErrorHandler();
+
     private Q(File file, Reader reader, InputStream stream, boolean close) throws XmlException {
         if ((file != null && reader != null)
                 || (file != null && stream != null)
@@ -172,13 +183,11 @@ public class Q implements Iterable<Element> {
             Document document = null;
             boolean addedRoot = false;
 
-            // TODO: Try to inhibit error messages about content not being
-            // allowed in the prolog (when there is no root node).
             try {
                 if (reader != null) {
-                    document = DOMUtil.documentFromReader(reader);
+                    document = DOMUtil.documentFromReader(reader, ImmutableMap.of("error-handler", IGNORED_ERROR_HANDLER));
                 } else if (stream != null) {
-                    document = DOMUtil.documentFromStream(stream);
+                    document = DOMUtil.documentFromStream(stream, ImmutableMap.of("error-handler", IGNORED_ERROR_HANDLER));
                 } else {
                     throw new NullPointerException("One of a file, reader or stream is required!");
                 }

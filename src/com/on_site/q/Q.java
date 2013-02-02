@@ -9,9 +9,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
 import com.on_site.fn.ElementPredicate;
+import com.on_site.fn.ElementTo;
 import com.on_site.fn.ElementToElement;
 import com.on_site.fn.ElementToElements;
-import com.on_site.fn.ElementToGeneric;
 import com.on_site.fn.ElementToQ;
 import com.on_site.fn.ElementToString;
 import com.on_site.frizzle.Frizzle;
@@ -1821,7 +1821,7 @@ public class Q implements Iterable<Element> {
      * @param map A mapping function to load the resulting list with.
      * @return A list of objects mapped from the selected elements.
      */
-    public <T> List<T> map(ElementToGeneric<T> map) {
+    public <T> List<T> map(ElementTo<T> map) {
         List<T> result = new ArrayList<T>(size());
 
         for (Element context : this) {

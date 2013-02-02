@@ -3,9 +3,9 @@ package com.on_site.q;
 import static com.on_site.q.Q.$;
 
 import com.on_site.fn.ElementPredicate;
+import com.on_site.fn.ElementTo;
 import com.on_site.fn.ElementToElement;
 import com.on_site.fn.ElementToElements;
-import com.on_site.fn.ElementToGeneric;
 import com.on_site.fn.ElementToQ;
 import com.on_site.util.TestBase;
 
@@ -330,7 +330,7 @@ public class QTraversingTest extends TestBase {
     public void mapToGeneric() throws Exception {
         Q q = $("<test><sub id='1'><foo/></sub> <sub id='2'/> <sub id='3'><bar/><sib/></sub></test>");
         final Q sibs = q.find("sib");
-        List<String> mapped = q.find("sub").map(new ElementToGeneric<String>() {
+        List<String> mapped = q.find("sub").map(new ElementTo<String>() {
             @Override
             public String apply(Element element) {
                 return $(element).attr("id");
@@ -341,7 +341,7 @@ public class QTraversingTest extends TestBase {
         assertEquals(mapped.get(1), "2", "Item");
         assertEquals(mapped.get(2), "3", "Item");
 
-        mapped = q.find("sub").map(new ElementToGeneric<String>() {
+        mapped = q.find("sub").map(new ElementTo<String>() {
             @Override
             public String apply(Element element) {
                 String id = $(element).attr("id");

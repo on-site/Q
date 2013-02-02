@@ -1,7 +1,5 @@
 package com.on_site.fn;
 
-import com.google.common.base.Function;
-
 import org.w3c.dom.Element;
 
 /**
@@ -9,5 +7,5 @@ import org.w3c.dom.Element;
  *
  * @author Mike Virata-Stone
  */
-public interface ElementToString extends Function<Element, String> {
+public interface ElementToString extends ElementTo<String> {
 }

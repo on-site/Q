@@ -9,5 +9,5 @@ import org.w3c.dom.Element;
  *
  * @author Mike Virata-Stone
  */
-public interface ElementToGeneric<T> extends Function<Element, T> {
+public interface ElementTo<T> extends Function<Element, T> {
 }

@@ -1382,8 +1382,15 @@ public class Q implements Iterable<Element> {
 
     // -------------- Traversing --------------
 
-    public Q add(String selector) throws TODO {
-        throw new TODO();
+    /**
+     * Select elements in the document with the given selector and add
+     * them with the currently selected items, returning the result.
+     *
+     * @param selector The selector to select additional elements.
+     * @return A new Q with these elements and the new elements.
+     */
+    public Q add(String selector) {
+        return add($(selector, document()));
     }
 
     public Q add(Element element) throws TODO {
@@ -1394,8 +1401,22 @@ public class Q implements Iterable<Element> {
         throw new TODO();
     }
 
-    public Q add(Q q) throws TODO {
-        throw new TODO();
+    /**
+     * Combine these selected elements with those in the given q.
+     *
+     * @param q A set of additional elements to select.
+     * @return A new Q with these elements and the new elements.
+     */
+    public Q add(Q q) {
+        List<Element> result = new LinkedList<Element>(asList());
+
+        if (q != null) {
+            for (Element element : q) {
+                result.add(element);
+            }
+        }
+
+        return $select(result);
     }
 
     public Q add(String selector, Element context) throws TODO {

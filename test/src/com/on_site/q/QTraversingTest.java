@@ -16,6 +16,60 @@ import org.w3c.dom.Element;
 
 public class QTraversingTest extends TestBase {
     @Test
+    public void addSelector() throws Exception {
+        Q q = $("<test><sub/> <sib/> <sub><sib/></sub> <sib><sub/><other/></sib> <other/> <sub/></test>");
+        Q subs = $("sub", q.document());
+        Q sibs = $("sib", q.document());
+        assertEquals(subs.add("sib").size(), 7, "Size");
+        assertEquals(subs.add("sib").get(0), subs.get(0), "Element");
+        assertEquals(subs.add("sib").get(1), subs.get(1), "Element");
+        assertEquals(subs.add("sib").get(2), subs.get(2), "Element");
+        assertEquals(subs.add("sib").get(3), subs.get(3), "Element");
+        assertEquals(subs.add("sib").get(4), sibs.get(0), "Element");
+        assertEquals(subs.add("sib").get(5), sibs.get(1), "Element");
+        assertEquals(subs.add("sib").get(6), sibs.get(2), "Element");
+
+        assertEquals(subs.add("subs").size(), 4, "Size");
+        assertEquals(subs.add("subs").get(0), subs.get(0), "Element");
+        assertEquals(subs.add("subs").get(1), subs.get(1), "Element");
+        assertEquals(subs.add("subs").get(2), subs.get(2), "Element");
+        assertEquals(subs.add("subs").get(3), subs.get(3), "Element");
+
+        assertEquals(subs.add((String) null).size(), 4, "Size");
+        assertEquals(subs.add((String) null).get(0), subs.get(0), "Element");
+        assertEquals(subs.add((String) null).get(1), subs.get(1), "Element");
+        assertEquals(subs.add((String) null).get(2), subs.get(2), "Element");
+        assertEquals(subs.add((String) null).get(3), subs.get(3), "Element");
+    }
+
+    @Test
+    public void addQ() throws Exception {
+        Q q = $("<test><sub/> <sib/> <sub><sib/></sub> <sib><sub/><other/></sib> <other/> <sub/></test>");
+        Q subs = $("sub", q.document());
+        Q sibs = $("sib", q.document());
+        assertEquals(subs.add($("sib", q.document())).size(), 7, "Size");
+        assertEquals(subs.add($("sib", q.document())).get(0), subs.get(0), "Element");
+        assertEquals(subs.add($("sib", q.document())).get(1), subs.get(1), "Element");
+        assertEquals(subs.add($("sib", q.document())).get(2), subs.get(2), "Element");
+        assertEquals(subs.add($("sib", q.document())).get(3), subs.get(3), "Element");
+        assertEquals(subs.add($("sib", q.document())).get(4), sibs.get(0), "Element");
+        assertEquals(subs.add($("sib", q.document())).get(5), sibs.get(1), "Element");
+        assertEquals(subs.add($("sib", q.document())).get(6), sibs.get(2), "Element");
+
+        assertEquals(subs.add($("subs", q.document())).size(), 4, "Size");
+        assertEquals(subs.add($("subs", q.document())).get(0), subs.get(0), "Element");
+        assertEquals(subs.add($("subs", q.document())).get(1), subs.get(1), "Element");
+        assertEquals(subs.add($("subs", q.document())).get(2), subs.get(2), "Element");
+        assertEquals(subs.add($("subs", q.document())).get(3), subs.get(3), "Element");
+
+        assertEquals(subs.add((Q) null).size(), 4, "Size");
+        assertEquals(subs.add((Q) null).get(0), subs.get(0), "Element");
+        assertEquals(subs.add((Q) null).get(1), subs.get(1), "Element");
+        assertEquals(subs.add((Q) null).get(2), subs.get(2), "Element");
+        assertEquals(subs.add((Q) null).get(3), subs.get(3), "Element");
+    }
+
+    @Test
     public void children() throws Exception {
         Q q = $("sub", $("<test><sub/> <something /> <sub><p>Some sub <b>content</b></p></sub> <sub><b>More</b> sub <p>content <br/></p></sub></test>"));
         assertEquals(q.children().size(), 3, "Size");
@@ -46,6 +100,7 @@ public class QTraversingTest extends TestBase {
         assertEquals($("argle", q.document()).end().size(), 0, "Size");
 
         // Testing other filtering methods to ensure they pop properly
+        assertEquals(q.add("sub").end(), q, "The resulting Q");
         assertEquals(q.children().end(), q, "The resulting Q");
         assertEquals(q.filter("sub:eq(0)").end(), q, "The resulting Q");
         assertEquals(q.find("sub:eq(0)").end(), q, "The resulting Q");

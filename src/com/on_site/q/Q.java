@@ -34,7 +34,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -259,7 +258,7 @@ public class Q implements Iterable<Element> {
     }
 
     private Q(Element[] elements, Document document) {
-        this("", Arrays.copyOf(elements, elements.length), document);
+        this("", elements, document);
     }
 
     /**
@@ -301,8 +300,8 @@ public class Q implements Iterable<Element> {
         this.selector = selector;
         this.elements = unique(elements);
 
-        if (document == null && elements.length > 0) {
-            this.document = elements[0].getOwnerDocument();
+        if (document == null && this.elements.length > 0) {
+            this.document = this.elements[0].getOwnerDocument();
         } else {
             this.document = document;
         }
@@ -694,9 +693,21 @@ public class Q implements Iterable<Element> {
      * list view of the instance elements array.
      */
     private Element[] unique(Element[] elements) {
-        ImmutableSet<Element> set = ImmutableSet.<Element>builder().add(elements).build();
-        list = ImmutableList.<Element>builder().addAll(set).build();
-        return list.toArray(new Element[list.size()]);
+        if (elements == null) {
+            return new Element[0];
+        }
+
+        ImmutableSet.Builder<Element> builder = ImmutableSet.builder();
+
+        for (Element element : elements) {
+            if (element != null) {
+                builder.add(element);
+            }
+        }
+
+        ImmutableSet<Element> set = builder.build();
+        this.list = ImmutableList.<Element>builder().addAll(set).build();
+        return this.list.toArray(new Element[this.list.size()]);
     }
 
     private NodeList xmlToNodes(String xml) throws XmlException {
@@ -1393,12 +1404,26 @@ public class Q implements Iterable<Element> {
         return add($(selector, document()));
     }
 
-    public Q add(Element element) throws TODO {
-        throw new TODO();
+    /**
+     * Add the given element to the set of selected elements and
+     * return the resulting Q.
+     *
+     * @param element The element to include.
+     * @return A new Q with these elements plus the new one.
+     */
+    public Q add(Element element) {
+        return add($(element));
     }
 
-    public Q add(Element[] elements) throws TODO {
-        throw new TODO();
+    /**
+     * Add the given elements to the set of selected elements and
+     * return the resulting Q.
+     *
+     * @param elements The elements to include.
+     * @return A new Q with these elements plus the new ones.
+     */
+    public Q add(Element[] elements) {
+        return add($(elements));
     }
 
     /**

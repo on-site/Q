@@ -43,24 +43,82 @@ public class QTraversingTest extends TestBase {
     }
 
     @Test
+    public void addElement() throws Exception {
+        Q q = $("<test><sub/> <sib/> <sub><sib/></sub> <sib><sub/><other/></sib> <other/> <sub/></test>");
+        Q subs = $("sub", q.document());
+        Q sibs = $("sib", q.document());
+        assertEquals(subs.add(sibs.get(1)).size(), 5, "Size");
+        assertEquals(subs.add(sibs.get(1)).get(0), subs.get(0), "Element");
+        assertEquals(subs.add(sibs.get(1)).get(1), subs.get(1), "Element");
+        assertEquals(subs.add(sibs.get(1)).get(2), subs.get(2), "Element");
+        assertEquals(subs.add(sibs.get(1)).get(3), subs.get(3), "Element");
+        assertEquals(subs.add(sibs.get(1)).get(4), sibs.get(1), "Element");
+
+        assertEquals(subs.add("subs").size(), 4, "Size");
+        assertEquals(subs.add(subs.get(2)).get(0), subs.get(0), "Element");
+        assertEquals(subs.add(subs.get(2)).get(1), subs.get(1), "Element");
+        assertEquals(subs.add(subs.get(2)).get(2), subs.get(2), "Element");
+        assertEquals(subs.add(subs.get(2)).get(3), subs.get(3), "Element");
+
+        assertEquals(subs.add((Element) null).size(), 4, "Size");
+        assertEquals(subs.add((Element) null).get(0), subs.get(0), "Element");
+        assertEquals(subs.add((Element) null).get(1), subs.get(1), "Element");
+        assertEquals(subs.add((Element) null).get(2), subs.get(2), "Element");
+        assertEquals(subs.add((Element) null).get(3), subs.get(3), "Element");
+    }
+
+    @Test
+    public void addElements() throws Exception {
+        Q q = $("<test><sub/> <sib/> <sub><sib/></sub> <sib><sub/><other/></sib> <other/> <sub/></test>");
+        Q subs = $("sub", q.document());
+        Q sibs = $("sib", q.document());
+        assertEquals(subs.add(sibs.get()).size(), 7, "Size");
+        assertEquals(subs.add(sibs.get()).get(0), subs.get(0), "Element");
+        assertEquals(subs.add(sibs.get()).get(1), subs.get(1), "Element");
+        assertEquals(subs.add(sibs.get()).get(2), subs.get(2), "Element");
+        assertEquals(subs.add(sibs.get()).get(3), subs.get(3), "Element");
+        assertEquals(subs.add(sibs.get()).get(4), sibs.get(0), "Element");
+        assertEquals(subs.add(sibs.get()).get(5), sibs.get(1), "Element");
+        assertEquals(subs.add(sibs.get()).get(6), sibs.get(2), "Element");
+
+        assertEquals(subs.add(subs.get()).size(), 4, "Size");
+        assertEquals(subs.add(subs.get()).get(0), subs.get(0), "Element");
+        assertEquals(subs.add(subs.get()).get(1), subs.get(1), "Element");
+        assertEquals(subs.add(subs.get()).get(2), subs.get(2), "Element");
+        assertEquals(subs.add(subs.get()).get(3), subs.get(3), "Element");
+
+        assertEquals(subs.add((Element[]) null).size(), 4, "Size");
+        assertEquals(subs.add((Element[]) null).get(0), subs.get(0), "Element");
+        assertEquals(subs.add((Element[]) null).get(1), subs.get(1), "Element");
+        assertEquals(subs.add((Element[]) null).get(2), subs.get(2), "Element");
+        assertEquals(subs.add((Element[]) null).get(3), subs.get(3), "Element");
+
+        assertEquals(subs.add(new Element[] { null }).size(), 4, "Size");
+        assertEquals(subs.add(new Element[] { null }).get(0), subs.get(0), "Element");
+        assertEquals(subs.add(new Element[] { null }).get(1), subs.get(1), "Element");
+        assertEquals(subs.add(new Element[] { null }).get(2), subs.get(2), "Element");
+        assertEquals(subs.add(new Element[] { null }).get(3), subs.get(3), "Element");
+    }
+
+    @Test
     public void addQ() throws Exception {
         Q q = $("<test><sub/> <sib/> <sub><sib/></sub> <sib><sub/><other/></sib> <other/> <sub/></test>");
         Q subs = $("sub", q.document());
         Q sibs = $("sib", q.document());
-        assertEquals(subs.add($("sib", q.document())).size(), 7, "Size");
-        assertEquals(subs.add($("sib", q.document())).get(0), subs.get(0), "Element");
-        assertEquals(subs.add($("sib", q.document())).get(1), subs.get(1), "Element");
-        assertEquals(subs.add($("sib", q.document())).get(2), subs.get(2), "Element");
-        assertEquals(subs.add($("sib", q.document())).get(3), subs.get(3), "Element");
-        assertEquals(subs.add($("sib", q.document())).get(4), sibs.get(0), "Element");
-        assertEquals(subs.add($("sib", q.document())).get(5), sibs.get(1), "Element");
-        assertEquals(subs.add($("sib", q.document())).get(6), sibs.get(2), "Element");
+        assertEquals(subs.add(sibs).size(), 7, "Size");
+        assertEquals(subs.add(sibs).get(0), subs.get(0), "Element");
+        assertEquals(subs.add(sibs).get(1), subs.get(1), "Element");
+        assertEquals(subs.add(sibs).get(2), subs.get(2), "Element");
+        assertEquals(subs.add(sibs).get(3), subs.get(3), "Element");
+        assertEquals(subs.add(sibs).get(4), sibs.get(0), "Element");
+        assertEquals(subs.add(sibs).get(5), sibs.get(1), "Element");
+        assertEquals(subs.add(sibs).get(6), sibs.get(2), "Element");
 
-        assertEquals(subs.add($("subs", q.document())).size(), 4, "Size");
-        assertEquals(subs.add($("subs", q.document())).get(0), subs.get(0), "Element");
-        assertEquals(subs.add($("subs", q.document())).get(1), subs.get(1), "Element");
-        assertEquals(subs.add($("subs", q.document())).get(2), subs.get(2), "Element");
-        assertEquals(subs.add($("subs", q.document())).get(3), subs.get(3), "Element");
+        assertEquals(subs.add(subs).size(), 4, "Size");
+        assertEquals(subs.add(subs).get(0), subs.get(0), "Element");
+        assertEquals(subs.add(subs).get(1), subs.get(1), "Element");
+        assertEquals(subs.add(subs).get(2), subs.get(2), "Element");
+        assertEquals(subs.add(subs).get(3), subs.get(3), "Element");
 
         assertEquals(subs.add((Q) null).size(), 4, "Size");
         assertEquals(subs.add((Q) null).get(0), subs.get(0), "Element");

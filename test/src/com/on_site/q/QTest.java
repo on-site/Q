@@ -42,6 +42,9 @@ public class QTest extends TestBase {
 
         q = $((Element) null);
         assertSelectedSize(q, 0);
+
+        q = $((Element[]) null);
+        assertSelectedSize(q, 0);
     }
 
     @Test

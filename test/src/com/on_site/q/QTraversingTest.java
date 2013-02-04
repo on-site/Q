@@ -162,6 +162,48 @@ public class QTraversingTest extends TestBase {
     }
 
     @Test
+    public void addBack() throws Exception {
+        Q q = $("<test><sub/> <sib/> <sub><sib/></sub> <sib><sub/><other/></sib> <other/> <sub/></test>");
+        Q subs = q.find("sub");
+        Q sibs = q.find("sib");
+        assertEquals(subs.find("sib").addBack().size(), 5, "Size");
+        assertEquals(subs.find("sib").addBack().get(0), sibs.get(1), "Element");
+        assertEquals(subs.find("sib").addBack().get(1), subs.get(0), "Element");
+        assertEquals(subs.find("sib").addBack().get(2), subs.get(1), "Element");
+        assertEquals(subs.find("sib").addBack().get(3), subs.get(2), "Element");
+        assertEquals(subs.find("sib").addBack().get(4), subs.get(3), "Element");
+
+        assertEquals($("sub", q.document()).addBack().size(), 4, "Size");
+        assertEquals($("sub", q.document()).addBack().get(0), subs.get(0), "Element");
+        assertEquals($("sub", q.document()).addBack().get(1), subs.get(1), "Element");
+        assertEquals($("sub", q.document()).addBack().get(2), subs.get(2), "Element");
+        assertEquals($("sub", q.document()).addBack().get(3), subs.get(3), "Element");
+
+        assertEquals(subs.find("sib").first().addBack().size(), 1, "Size");
+        assertEquals(subs.find("sib").first().addBack().get(0), sibs.get(1), "Element");
+    }
+
+    @Test
+    public void addBackSelector() throws Exception {
+        Q q = $("<test><sub id='1'/> <sib/> <sub id='2'><sib/></sub> <sib><sub id='3'/><other/></sib> <other/> <sub id='4'/></test>");
+        Q subs = q.find("sub");
+        Q sibs = q.find("sib");
+        assertEquals(subs.find("sib").addBack("#2, #3").size(), 3, "Size");
+        assertEquals(subs.find("sib").addBack("#2, #3").get(0), sibs.get(1), "Element");
+        assertEquals(subs.find("sib").addBack("#2, #3").get(1), subs.get(1), "Element");
+        assertEquals(subs.find("sib").addBack("#2, #3").get(2), subs.get(2), "Element");
+
+        assertEquals($("sub", q.document()).addBack("#2").size(), 4, "Size");
+        assertEquals($("sub", q.document()).addBack("#2").get(0), subs.get(0), "Element");
+        assertEquals($("sub", q.document()).addBack("#2").get(1), subs.get(1), "Element");
+        assertEquals($("sub", q.document()).addBack("#2").get(2), subs.get(2), "Element");
+        assertEquals($("sub", q.document()).addBack("#2").get(3), subs.get(3), "Element");
+
+        assertEquals(subs.find("sib").first().addBack("sub").size(), 1, "Size");
+        assertEquals(subs.find("sib").first().addBack("sub").get(0), sibs.get(1), "Element");
+    }
+
+    @Test
     public void children() throws Exception {
         Q q = $("sub", $("<test><sub/> <something /> <sub><p>Some sub <b>content</b></p></sub> <sub><b>More</b> sub <p>content <br/></p></sub></test>"));
         assertEquals(q.children().size(), 3, "Size");
@@ -193,6 +235,7 @@ public class QTraversingTest extends TestBase {
 
         // Testing other filtering methods to ensure they pop properly
         assertEquals(q.add("sub").end(), q, "The resulting Q");
+        assertEquals(q.addBack().end(), q, "The resulting Q");
         assertEquals(q.children().end(), q, "The resulting Q");
         assertEquals(q.filter("sub:eq(0)").end(), q, "The resulting Q");
         assertEquals(q.find("sub:eq(0)").end(), q, "The resulting Q");

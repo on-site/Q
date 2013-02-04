@@ -703,6 +703,10 @@ public class Q implements Iterable<Element> {
         return $(element).setPreviousQ(this);
     }
 
+    private Q $select(Element[] elements) {
+        return $(elements, document()).setPreviousQ(this);
+    }
+
     private Q $select(Collection<Element> elements) {
         return $(elements.toArray(new Element[elements.size()]), document()).setPreviousQ(this);
     }
@@ -1486,12 +1490,36 @@ public class Q implements Iterable<Element> {
         return add($(selector, context));
     }
 
-    public Q addBack() throws TODO {
-        throw new TODO();
+    /**
+     * Add back the previously selected elements in the current chain
+     * of selections.
+     *
+     * @return A new Q with these elements and the previously selected
+     * elements.
+     */
+    public Q addBack() {
+        return addBack(null);
     }
 
-    public Q addBack(String selector) throws TODO {
-        throw new TODO();
+    /**
+     * Add back the previously selected elements in the current chain
+     * of selections, filtered by the given selector.  If the selector
+     * is null, this is equivalent to addBack().
+     *
+     * @param selector A selector to filter with.
+     * @return A new Q with these elements and the previously selected
+     * elements that match the selector.
+     */
+    public Q addBack(String selector) {
+        if (selector == null) {
+            return add(previousQ);
+        }
+
+        if (previousQ == null) {
+            return $select(get());
+        }
+
+        return add(previousQ.filter(selector));
     }
 
     /**

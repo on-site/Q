@@ -128,6 +128,40 @@ public class QTraversingTest extends TestBase {
     }
 
     @Test
+    public void addSelectorContext() throws Exception {
+        Q q = $("<test><sub/> <sib/> <sub><sib/></sub> <sib><sub/><other/></sib> <other/> <sub/></test>");
+        Q subs = $("sub", q.document());
+        Q sibs = $("sib", q.document());
+        assertEquals(subs.add("sib", subs.get(1)).size(), 5, "Size");
+        assertEquals(subs.add("sib", subs.get(1)).get(0), subs.get(0), "Element");
+        assertEquals(subs.add("sib", subs.get(1)).get(1), subs.get(1), "Element");
+        assertEquals(subs.add("sib", subs.get(1)).get(2), subs.get(2), "Element");
+        assertEquals(subs.add("sib", subs.get(1)).get(3), subs.get(3), "Element");
+        assertEquals(subs.add("sib", subs.get(1)).get(4), sibs.get(1), "Element");
+
+        assertEquals(subs.add("sub", sibs.get(2)).size(), 4, "Size");
+        assertEquals(subs.add("sub", sibs.get(2)).get(0), subs.get(0), "Element");
+        assertEquals(subs.add("sub", sibs.get(2)).get(1), subs.get(1), "Element");
+        assertEquals(subs.add("sub", sibs.get(2)).get(2), subs.get(2), "Element");
+        assertEquals(subs.add("sub", sibs.get(2)).get(3), subs.get(3), "Element");
+
+        assertEquals(subs.add("sib", null).size(), 7, "Size");
+        assertEquals(subs.add("sib", null).get(0), subs.get(0), "Element");
+        assertEquals(subs.add("sib", null).get(1), subs.get(1), "Element");
+        assertEquals(subs.add("sib", null).get(2), subs.get(2), "Element");
+        assertEquals(subs.add("sib", null).get(3), subs.get(3), "Element");
+        assertEquals(subs.add("sib", null).get(4), sibs.get(0), "Element");
+        assertEquals(subs.add("sib", null).get(5), sibs.get(1), "Element");
+        assertEquals(subs.add("sib", null).get(6), sibs.get(2), "Element");
+
+        assertEquals(subs.add(null, subs.get(1)).size(), 4, "Size");
+        assertEquals(subs.add(null, subs.get(1)).get(0), subs.get(0), "Element");
+        assertEquals(subs.add(null, subs.get(1)).get(1), subs.get(1), "Element");
+        assertEquals(subs.add(null, subs.get(1)).get(2), subs.get(2), "Element");
+        assertEquals(subs.add(null, subs.get(1)).get(3), subs.get(3), "Element");
+    }
+
+    @Test
     public void children() throws Exception {
         Q q = $("sub", $("<test><sub/> <something /> <sub><p>Some sub <b>content</b></p></sub> <sub><b>More</b> sub <p>content <br/></p></sub></test>"));
         assertEquals(q.children().size(), 3, "Size");

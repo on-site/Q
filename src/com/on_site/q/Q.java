@@ -150,6 +150,7 @@ public class Q implements Iterable<Element> {
     }
 
     private static class IgnoredErrorHandler implements DOMErrorHandler {
+        @Override
         public boolean handleError(DOMError error) {
             return true;
         }
@@ -279,6 +280,17 @@ public class Q implements Iterable<Element> {
      * selector.
      *
      * @param selector The selector used to select elements.
+     * @param context The element context to select from.
+     */
+    public Q(String selector, Element context) {
+        this(selector, $(context));
+    }
+
+    /**
+     * Select elements from the context based on the given Frizzle
+     * selector.
+     *
+     * @param selector The selector used to select elements.
      * @param context The Q context to select from.
      */
     public Q(String selector, Q context) {
@@ -287,7 +299,7 @@ public class Q implements Iterable<Element> {
 
         List<Element> result = new LinkedList<Element>();
 
-        for (Element element : context.elements) {
+        for (Element element : context) {
             for (Element e : frizzle().select(selector, element)) {
                 result.add(e);
             }
@@ -442,6 +454,18 @@ public class Q implements Iterable<Element> {
      * @return A Q with selected items from the context.
      */
     public static Q $(String selector, Q context) {
+        return new Q(selector, context);
+    }
+
+    /**
+     * Select elements from the context based on the given Frizzle
+     * selector.
+     *
+     * @param selector The selector used to select elements.
+     * @param context The element context to select from.
+     * @return A Q with selected items from the context.
+     */
+    public static Q $(String selector, Element context) {
         return new Q(selector, context);
     }
 
@@ -1401,7 +1425,7 @@ public class Q implements Iterable<Element> {
      * @return A new Q with these elements and the new elements.
      */
     public Q add(String selector) {
-        return add($(selector, document()));
+        return add(selector, null);
     }
 
     /**
@@ -1444,8 +1468,22 @@ public class Q implements Iterable<Element> {
         return $select(result);
     }
 
-    public Q add(String selector, Element context) throws TODO {
-        throw new TODO();
+    /**
+     * Select elements in the document with the given selector and
+     * element context and add them with the currently selected items,
+     * returning the result.  If the context is null, it is as if
+     * calling add(selector).
+     *
+     * @param selector The selector to select additional elements.
+     * @param context The context to select elements from.
+     * @return A new Q with these elements and the new elements.
+     */
+    public Q add(String selector, Element context) {
+        if (context == null) {
+            return add($(selector, document()));
+        }
+
+        return add($(selector, context));
     }
 
     public Q addBack() throws TODO {

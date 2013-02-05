@@ -250,6 +250,7 @@ public class QTraversingTest extends TestBase {
         }).end(), q, "The resulting Q");
         assertEquals(q.next().end(), q, "The resulting Q");
         assertEquals(q.nextAll().end(), q, "The resulting Q");
+        assertEquals(q.not("#testing").end(), q, "The resulting Q");
         assertEquals(q.prev().end(), q, "The resulting Q");
         assertEquals(q.prevAll().end(), q, "The resulting Q");
     }
@@ -601,6 +602,146 @@ public class QTraversingTest extends TestBase {
         assertEquals($("sub:eq(0)", q.document()).nextAll("sib").size(), 1, "Size");
         assertEquals($("sub:eq(0)", q.document()).nextAll("sib").get(0), $("sib", q.document()).get(0), "Element");
         assertEquals($("sub:eq(0)", q.document()).nextAll("argle").isEmpty(), true, "isEmpty");
+    }
+
+    @Test
+    public void notSelector() throws Exception {
+        Q q = $("<test><sub id='1'/> <sib/> <sub id='2'><sib/></sub> <sib><sub id='3'/><other/></sib> <other/> <sub id='4'/></test>");
+        Q subs = $("sub", q.document());
+        assertEquals(subs.not("#2,#3").size(), 2, "Size");
+        assertEquals(subs.not("#2,#3").get(0), subs.get(0), "Element");
+        assertEquals(subs.not("#2,#3").get(1), subs.get(3), "Element");
+
+        assertEquals(subs.not((String) null).size(), 4, "Size");
+        assertEquals(subs.not((String) null).get(0), subs.get(0), "Element");
+        assertEquals(subs.not((String) null).get(1), subs.get(1), "Element");
+        assertEquals(subs.not((String) null).get(2), subs.get(2), "Element");
+        assertEquals(subs.not((String) null).get(3), subs.get(3), "Element");
+
+        assertEquals(subs.not("sib").size(), 4, "Size");
+        assertEquals(subs.not("sib").get(0), subs.get(0), "Element");
+        assertEquals(subs.not("sib").get(1), subs.get(1), "Element");
+        assertEquals(subs.not("sib").get(2), subs.get(2), "Element");
+        assertEquals(subs.not("sib").get(3), subs.get(3), "Element");
+
+        assertEquals(subs.not("sub").size(), 0, "Size");
+    }
+
+    @Test
+    public void notElement() throws Exception {
+        Q q = $("<test><sub/> <sib/> <sub><sib/></sub> <sib><sub/><other/></sib> <other/> <sub/></test>");
+        Q subs = $("sub", q.document());
+        Q sibs = $("sib", q.document());
+        assertEquals(subs.not(subs.get(1)).size(), 3, "Size");
+        assertEquals(subs.not(subs.get(1)).get(0), subs.get(0), "Element");
+        assertEquals(subs.not(subs.get(1)).get(1), subs.get(2), "Element");
+        assertEquals(subs.not(subs.get(1)).get(2), subs.get(3), "Element");
+
+        assertEquals(subs.not((Element) null).size(), 4, "Size");
+        assertEquals(subs.not((Element) null).get(0), subs.get(0), "Element");
+        assertEquals(subs.not((Element) null).get(1), subs.get(1), "Element");
+        assertEquals(subs.not((Element) null).get(2), subs.get(2), "Element");
+        assertEquals(subs.not((Element) null).get(3), subs.get(3), "Element");
+
+        assertEquals(subs.not(sibs.get(0)).size(), 4, "Size");
+        assertEquals(subs.not(sibs.get(0)).get(0), subs.get(0), "Element");
+        assertEquals(subs.not(sibs.get(0)).get(1), subs.get(1), "Element");
+        assertEquals(subs.not(sibs.get(0)).get(2), subs.get(2), "Element");
+        assertEquals(subs.not(sibs.get(0)).get(3), subs.get(3), "Element");
+    }
+
+    @Test
+    public void notElements() throws Exception {
+        Q q = $("<test><sub/> <sib/> <sub><sib/></sub> <sib><sub/><other/></sib> <other/> <sub/></test>");
+        Q subs = $("sub", q.document());
+        Q sibs = $("sib", q.document());
+        assertEquals(subs.not(new Element[] { subs.get(1), subs.get(2) }).size(), 2, "Size");
+        assertEquals(subs.not(new Element[] { subs.get(1), subs.get(2) }).get(0), subs.get(0), "Element");
+        assertEquals(subs.not(new Element[] { subs.get(1), subs.get(2) }).get(1), subs.get(3), "Element");
+
+        assertEquals(subs.not((Element[]) null).size(), 4, "Size");
+        assertEquals(subs.not((Element[]) null).get(0), subs.get(0), "Element");
+        assertEquals(subs.not((Element[]) null).get(1), subs.get(1), "Element");
+        assertEquals(subs.not((Element[]) null).get(2), subs.get(2), "Element");
+        assertEquals(subs.not((Element[]) null).get(3), subs.get(3), "Element");
+
+        assertEquals(subs.not(new Element[] { subs.get(1), null, subs.get(2) }).size(), 2, "Size");
+        assertEquals(subs.not(new Element[] { subs.get(1), null, subs.get(2) }).get(0), subs.get(0), "Element");
+        assertEquals(subs.not(new Element[] { subs.get(1), null, subs.get(2) }).get(1), subs.get(3), "Element");
+
+        assertEquals(subs.not(sibs.get()).size(), 4, "Size");
+        assertEquals(subs.not(sibs.get()).get(0), subs.get(0), "Element");
+        assertEquals(subs.not(sibs.get()).get(1), subs.get(1), "Element");
+        assertEquals(subs.not(sibs.get()).get(2), subs.get(2), "Element");
+        assertEquals(subs.not(sibs.get()).get(3), subs.get(3), "Element");
+
+        assertEquals(subs.not(subs.get()).size(), 0, "Size");
+    }
+
+    @Test
+    public void notQ() throws Exception {
+        Q q = $("<test><sub id='1'/> <sib/> <sub id='2'><sib/></sub> <sib><sub id='3'/><other/></sib> <other/> <sub id='4'/></test>");
+        Q subs = $("sub", q.document());
+        assertEquals(subs.not($("#2,#3", q.document())).size(), 2, "Size");
+        assertEquals(subs.not($("#2,#3", q.document())).get(0), subs.get(0), "Element");
+        assertEquals(subs.not($("#2,#3", q.document())).get(1), subs.get(3), "Element");
+
+        assertEquals(subs.not((Q) null).size(), 4, "Size");
+        assertEquals(subs.not((Q) null).get(0), subs.get(0), "Element");
+        assertEquals(subs.not((Q) null).get(1), subs.get(1), "Element");
+        assertEquals(subs.not((Q) null).get(2), subs.get(2), "Element");
+        assertEquals(subs.not((Q) null).get(3), subs.get(3), "Element");
+
+        assertEquals(subs.not($("sib", q.document())).size(), 4, "Size");
+        assertEquals(subs.not($("sib", q.document())).get(0), subs.get(0), "Element");
+        assertEquals(subs.not($("sib", q.document())).get(1), subs.get(1), "Element");
+        assertEquals(subs.not($("sib", q.document())).get(2), subs.get(2), "Element");
+        assertEquals(subs.not($("sib", q.document())).get(3), subs.get(3), "Element");
+
+        assertEquals(subs.not($("sub", q.document())).size(), 0, "Size");
+    }
+
+    @Test
+    public void notPredicate() throws Exception {
+        Q q = $("<test><sub id='1'/> <sib/> <sub id='2'><sib/></sub> <sib><sub id='3'/><other/></sib> <other/> <sub id='4'/></test>");
+        Q subs = $("sub", q.document());
+        ElementPredicate predicate = new ElementPredicate() {
+            @Override
+            public boolean apply(Element element) {
+                String id = $(element).attr("id");
+                return id.equals("2") || id.equals("3");
+            }
+        };
+        assertEquals(subs.not(predicate).size(), 2, "Size");
+        assertEquals(subs.not(predicate).get(0), subs.get(0), "Element");
+        assertEquals(subs.not(predicate).get(1), subs.get(3), "Element");
+
+        predicate = null;
+        assertEquals(subs.not(predicate).size(), 4, "Size");
+        assertEquals(subs.not(predicate).get(0), subs.get(0), "Element");
+        assertEquals(subs.not(predicate).get(1), subs.get(1), "Element");
+        assertEquals(subs.not(predicate).get(2), subs.get(2), "Element");
+        assertEquals(subs.not(predicate).get(3), subs.get(3), "Element");
+
+        predicate = new ElementPredicate() {
+            @Override
+            public boolean apply(Element element) {
+                return $(element).is("sib");
+            }
+        };
+        assertEquals(subs.not(predicate).size(), 4, "Size");
+        assertEquals(subs.not(predicate).get(0), subs.get(0), "Element");
+        assertEquals(subs.not(predicate).get(1), subs.get(1), "Element");
+        assertEquals(subs.not(predicate).get(2), subs.get(2), "Element");
+        assertEquals(subs.not(predicate).get(3), subs.get(3), "Element");
+
+        predicate = new ElementPredicate() {
+            @Override
+            public boolean apply(Element element) {
+                return $(element).is("sub");
+            }
+        };
+        assertEquals(subs.not(predicate).size(), 0, "Size");
     }
 
     @Test

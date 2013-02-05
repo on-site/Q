@@ -2069,24 +2069,97 @@ public class Q implements Iterable<Element> {
         throw new TODO();
     }
 
-    public Q not(String selector) throws TODO {
-        throw new TODO();
+    /**
+     * Select the elements currently selected, minus those that match
+     * the given selector.
+     *
+     * @param selector The selector of elements to not include.
+     * @return A new Q minus elements that match the selector.
+     */
+    public Q not(String selector) {
+        if (selector == null) {
+            return $select(get());
+        }
+
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element element : this) {
+            if (!frizzle().matchesSelector(element, selector)) {
+                result.add(element);
+            }
+        }
+
+        return $select(result);
     }
 
-    public Q not(Element element) throws TODO {
-        throw new TODO();
+    /**
+     * Select the elements currently selected, except the given
+     * element.
+     *
+     * @param element The element to not include.
+     * @return A new Q minus given element.
+     */
+    public Q not(Element element) {
+        return not($(element));
     }
 
-    public Q not(Element[] elements) throws TODO {
-        throw new TODO();
+    /**
+     * Select the elements currently selected, except the given
+     * elements.
+     *
+     * @param elements The elements to not include.
+     * @return A new Q minus given elements.
+     */
+    public Q not(Element[] elements) {
+        return not($(elements));
     }
 
-    public Q not(ElementPredicate predicate) throws TODO {
-        throw new TODO();
+    /**
+     * Select the elements currently selected, except those in the
+     * given Q.
+     *
+     * @param q A Q of elements to not include.
+     * @return A new Q minus the elements given in the q.
+     */
+    public Q not(Q q) {
+        if (q == null) {
+            return $select(get());
+        }
+
+        ImmutableSet<Element> others = q.asSet();
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element element : this) {
+            if (!others.contains(element)) {
+                result.add(element);
+            }
+        }
+
+        return $select(result);
     }
 
-    public Q not(Q q) throws TODO {
-        throw new TODO();
+    /**
+     * Select the elements currently selected, except those where the
+     * predicate returns true.
+     *
+     * @param q A predicate to filter the selected items with..
+     * @return A new Q minus the elements where the predicate returns
+     * true.
+     */
+    public Q not(ElementPredicate predicate) {
+        if (predicate == null) {
+            return $select(get());
+        }
+
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element element : this) {
+            if (!predicate.apply(element)) {
+                result.add(element);
+            }
+        }
+
+        return $select(result);
     }
 
     /**

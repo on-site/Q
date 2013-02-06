@@ -2207,12 +2207,45 @@ public class Q implements Iterable<Element> {
         return $select(result);
     }
 
-    public Q parents() throws TODO {
-        throw new TODO();
+    /**
+     * Obtain a Q of all the parent elements of the selected elements,
+     * on up to the root of the document.
+     *
+     * @return A Q with all parents of the selected elements.
+     */
+    public Q parents() {
+        return parents(null);
     }
 
-    public Q parents(String selector) throws TODO {
-        throw new TODO();
+    /**
+     * Obtain a Q of all the parent elements of the selected elements,
+     * on up to the root of the document, filtered by the given
+     * selector (if it is non-null).
+     *
+     * @param selector The selector to filter the results with, if
+     * non-null.
+     * @return A Q with the filtered parents of the selected elements.
+     */
+    public Q parents(String selector) {
+        List<Element> result = new LinkedList<Element>();
+
+        for (Element element : this) {
+            Node parent = element;
+
+            while ((parent = parent.getParentNode()) != null) {
+                if (!(parent instanceof Element)) {
+                    continue;
+                }
+
+                if (selector != null && !frizzle().matchesSelector((Element) parent, selector)) {
+                    continue;
+                }
+
+                result.add((Element) parent);
+            }
+        }
+
+        return $select(result);
     }
 
     public Q parentsUntil(String selector) throws TODO {

@@ -251,6 +251,8 @@ public class QTraversingTest extends TestBase {
         assertEquals(q.next().end(), q, "The resulting Q");
         assertEquals(q.nextAll().end(), q, "The resulting Q");
         assertEquals(q.not("#testing").end(), q, "The resulting Q");
+        assertEquals(q.parent().end(), q, "The resulting Q");
+        assertEquals(q.parents().end(), q, "The resulting Q");
         assertEquals(q.prev().end(), q, "The resulting Q");
         assertEquals(q.prevAll().end(), q, "The resulting Q");
     }
@@ -773,10 +775,54 @@ public class QTraversingTest extends TestBase {
 
     @Test
     public void parents() throws Exception {
+        Q doc = $("<test>" +
+                  "  <container1><outer1><inner/></outer1></container1>" +
+                  "  <container2><outer2>Some<sib/> <inner/> content with <sibling/></outer2></container2>" +
+                  "  <container3><outer3>Some<sib/></outer3></container3>" +
+                  "  <inner/>" +
+                  "</test>");
+        Q q = $("inner", doc.document());
+        Q inners = $("inner", q.document());
+        assertEquals(inners.parents().size(), 5, "Size");
+        assertEquals(inners.parents().get(0), doc.find("outer1").get(0), "Element");
+        assertEquals(inners.parents().get(1), doc.find("container1").get(0), "Element");
+        assertEquals(inners.parents().get(2), $(":root", doc.document()).get(0), "Element");
+        assertEquals(inners.parents().get(3), doc.find("outer2").get(0), "Element");
+        assertEquals(inners.parents().get(4), doc.find("container2").get(0), "Element");
+
+        assertEquals(doc.find("outer2").parents().size(), 2, "Size");
+        assertEquals(doc.find("outer2").parents().get(0), doc.find("container2").get(0), "Element");
+        assertEquals(doc.find("outer2").parents().get(1), $(":root", doc.document()).get(0), "Element");
+
+        assertEquals(doc.parents().size(), 0, "Size");
     }
 
     @Test
     public void parentsSelector() throws Exception {
+        Q doc = $("<test>" +
+                  "  <container id='1'><outer1><inner/></outer1></container>" +
+                  "  <container id='2'><outer2>Some<sib/> <inner/> content with <sibling/></outer2></container>" +
+                  "  <container id='3'><outer3>Some<sib/></outer3></container>" +
+                  "  <inner/>" +
+                  "</test>");
+        Q q = $("inner", doc.document());
+        Q inners = $("inner", q.document());
+        assertEquals(inners.parents("container").size(), 2, "Size");
+        assertEquals(inners.parents("container").get(0), doc.find("container#1").get(0), "Element");
+        assertEquals(inners.parents("container").get(1), doc.find("container#2").get(0), "Element");
+
+        assertEquals(doc.find("outer2").parents("container").size(), 1, "Size");
+        assertEquals(doc.find("outer2").parents("container").get(0), doc.find("container#2").get(0), "Element");
+
+        assertEquals(doc.parents("test").size(), 0, "Size");
+        assertEquals(inners.parents("missing").size(), 0, "Size");
+
+        assertEquals(inners.parents(null).size(), 5, "Size");
+        assertEquals(inners.parents(null).get(0), doc.find("outer1").get(0), "Element");
+        assertEquals(inners.parents(null).get(1), doc.find("container#1").get(0), "Element");
+        assertEquals(inners.parents(null).get(2), $(":root", doc.document()).get(0), "Element");
+        assertEquals(inners.parents(null).get(3), doc.find("outer2").get(0), "Element");
+        assertEquals(inners.parents(null).get(4), doc.find("container#2").get(0), "Element");
     }
 
     @Test

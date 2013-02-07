@@ -255,6 +255,7 @@ public class QTraversingTest extends TestBase {
         assertEquals(q.parents().end(), q, "The resulting Q");
         assertEquals(q.prev().end(), q, "The resulting Q");
         assertEquals(q.prevAll().end(), q, "The resulting Q");
+        assertEquals(q.slice(2).end(), q, "The resulting Q");
     }
 
     @Test
@@ -877,5 +878,96 @@ public class QTraversingTest extends TestBase {
         assertEquals($("sub:eq(2)", q.document()).prevAll("sib").size(), 1, "Size");
         assertEquals($("sub:eq(2)", q.document()).prevAll("sib").get(0), $("sib", q.document()).get(0), "Element");
         assertEquals($("sub:eq(2)", q.document()).prevAll("argle").isEmpty(), true, "isEmpty");
+    }
+
+    @Test
+    public void sliceStart() throws Exception {
+        Q q = $("<test><sub/> <container><sub><child/></sub></container> <sub/> <sib/> <sub/> <sub>Another <child/></sub></test>");
+        Q subs = $("sub", q.document());
+        assertEquals(subs.slice(0).size(), 5, "Size");
+        assertEquals(subs.slice(0).get(0), subs.get(0), "Element");
+        assertEquals(subs.slice(0).get(1), subs.get(1), "Element");
+        assertEquals(subs.slice(0).get(2), subs.get(2), "Element");
+        assertEquals(subs.slice(0).get(3), subs.get(3), "Element");
+        assertEquals(subs.slice(0).get(4), subs.get(4), "Element");
+
+        assertEquals(subs.slice(3).size(), 2, "Size");
+        assertEquals(subs.slice(3).get(0), subs.get(3), "Element");
+        assertEquals(subs.slice(3).get(1), subs.get(4), "Element");
+
+        assertEquals(subs.slice(-5).size(), 5, "Size");
+        assertEquals(subs.slice(-5).get(0), subs.get(0), "Element");
+        assertEquals(subs.slice(-5).get(1), subs.get(1), "Element");
+        assertEquals(subs.slice(-5).get(2), subs.get(2), "Element");
+        assertEquals(subs.slice(-5).get(3), subs.get(3), "Element");
+        assertEquals(subs.slice(-5).get(4), subs.get(4), "Element");
+
+        assertEquals(subs.slice(-8).size(), 5, "Size");
+        assertEquals(subs.slice(-8).get(0), subs.get(0), "Element");
+        assertEquals(subs.slice(-8).get(1), subs.get(1), "Element");
+        assertEquals(subs.slice(-8).get(2), subs.get(2), "Element");
+        assertEquals(subs.slice(-8).get(3), subs.get(3), "Element");
+        assertEquals(subs.slice(-8).get(4), subs.get(4), "Element");
+
+        assertEquals(subs.slice(-2).size(), 2, "Size");
+        assertEquals(subs.slice(-2).get(0), subs.get(3), "Element");
+        assertEquals(subs.slice(-2).get(1), subs.get(4), "Element");
+
+        assertEquals(subs.slice(5).size(), 0, "Size");
+        assertEquals(subs.slice(6).size(), 0, "Size");
+    }
+
+    @Test
+    public void sliceStartEnd() throws Exception {
+        Q q = $("<test><sub/> <container><sub><child/></sub></container> <sub/> <sib/> <sub/> <sub>Another <child/></sub></test>");
+        Q subs = $("sub", q.document());
+        assertEquals(subs.slice(0, 5).size(), 5, "Size");
+        assertEquals(subs.slice(0, 5).get(0), subs.get(0), "Element");
+        assertEquals(subs.slice(0, 5).get(1), subs.get(1), "Element");
+        assertEquals(subs.slice(0, 5).get(2), subs.get(2), "Element");
+        assertEquals(subs.slice(0, 5).get(3), subs.get(3), "Element");
+        assertEquals(subs.slice(0, 5).get(4), subs.get(4), "Element");
+
+        assertEquals(subs.slice(1, 3).size(), 2, "Size");
+        assertEquals(subs.slice(1, 3).get(0), subs.get(1), "Element");
+        assertEquals(subs.slice(1, 3).get(1), subs.get(2), "Element");
+
+        assertEquals(subs.slice(-5, 5).size(), 5, "Size");
+        assertEquals(subs.slice(-5, 5).get(0), subs.get(0), "Element");
+        assertEquals(subs.slice(-5, 5).get(1), subs.get(1), "Element");
+        assertEquals(subs.slice(-5, 5).get(2), subs.get(2), "Element");
+        assertEquals(subs.slice(-5, 5).get(3), subs.get(3), "Element");
+        assertEquals(subs.slice(-5, 5).get(4), subs.get(4), "Element");
+
+        assertEquals(subs.slice(-8, 6).size(), 5, "Size");
+        assertEquals(subs.slice(-8, 6).get(0), subs.get(0), "Element");
+        assertEquals(subs.slice(-8, 6).get(1), subs.get(1), "Element");
+        assertEquals(subs.slice(-8, 6).get(2), subs.get(2), "Element");
+        assertEquals(subs.slice(-8, 6).get(3), subs.get(3), "Element");
+        assertEquals(subs.slice(-8, 6).get(4), subs.get(4), "Element");
+
+        assertEquals(subs.slice(-3, 4).size(), 2, "Size");
+        assertEquals(subs.slice(-3, 4).get(0), subs.get(2), "Element");
+        assertEquals(subs.slice(-3, 4).get(1), subs.get(3), "Element");
+
+        assertEquals(subs.slice(2, -1).size(), 2, "Size");
+        assertEquals(subs.slice(2, -1).get(0), subs.get(2), "Element");
+        assertEquals(subs.slice(2, -1).get(1), subs.get(3), "Element");
+
+        assertEquals(subs.slice(-3, -1).size(), 2, "Size");
+        assertEquals(subs.slice(-3, -1).get(0), subs.get(2), "Element");
+        assertEquals(subs.slice(-3, -1).get(1), subs.get(3), "Element");
+
+        assertEquals(subs.slice(2, 2).size(), 0, "Size");
+        assertEquals(subs.slice(5, 5).size(), 0, "Size");
+        assertEquals(subs.slice(5, 8).size(), 0, "Size");
+        assertEquals(subs.slice(6, 8).size(), 0, "Size");
+        assertEquals(subs.slice(4, 3).size(), 0, "Size");
+        assertEquals(subs.slice(-2, -2).size(), 0, "Size");
+        assertEquals(subs.slice(-5, -5).size(), 0, "Size");
+        assertEquals(subs.slice(-8, -8).size(), 0, "Size");
+        assertEquals(subs.slice(-2, -3).size(), 0, "Size");
+        assertEquals(subs.slice(3, -3).size(), 0, "Size");
+        assertEquals(subs.slice(-2, 2).size(), 0, "Size");
     }
 }

@@ -606,6 +606,22 @@ public class Q implements Iterable<Element> {
         return this;
     }
 
+    private int adjustIndex(int index) {
+        if (index < 0) {
+            index = size() + index;
+        }
+
+        if (index < 0) {
+            index = 0;
+        }
+
+        if (index > size()) {
+            index = size();
+        }
+
+        return index;
+    }
+
     private static Element[] asArray(Element element) {
         if (element == null) {
             return new Element[0];
@@ -2397,12 +2413,42 @@ public class Q implements Iterable<Element> {
         throw new TODO();
     }
 
-    public Q slice(int start) throws TODO {
-        throw new TODO();
+    /**
+     * Slice this list of elements to a subset of the elements.  The
+     * index indicates where to start the slice, and the end goes to
+     * the end of the set.  If the index is negative, it counts back
+     * from the end of the list.  If the index goes outside the bounds
+     * of the set, it is adjusted to be within bounds.
+     *
+     * @param start The start index to slice the results.
+     * @return A new Q with the sliced results.
+     */
+    public Q slice(int start) {
+        return slice(start, size());
     }
 
-    public Q slice(int start, int end) throws TODO {
-        throw new TODO();
+    /**
+     * Slice this list of elements to a subset of the elements.  The
+     * start index indicates where to start the slice (inclusive), and
+     * the end index indicates the end of the slice (exclusive).  If
+     * the index is negative, it counts back from the end of the list.
+     * If the index goes outside the bounds of the set, it is adjusted
+     * to be within bounds.  If the end is less than the start, it is
+     * adjusted as the same as the start.
+     *
+     * @param start The start index (inclusive) to slice the results.
+     * @param end The end index (exclusive) to slice the results.
+     * @return A new Q with the sliced results.
+     */
+    public Q slice(int start, int end) {
+        start = adjustIndex(start);
+        end = adjustIndex(end);
+
+        if (end < start) {
+            end = start;
+        }
+
+        return $select(asList().subList(start, end));
     }
 
     // -------------- Additional utility methods not defined by jQuery --------------

@@ -1,11 +1,12 @@
 package com.on_site.q;
 
-import com.google.common.base.Function;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
@@ -642,9 +643,9 @@ public class Q implements Iterable<Element> {
         return ImmutableSet.<Element>builder().add(elements).build();
     }
 
-    private static final ConcurrentMap<Document, Frizzle> FRIZZLES = new MapMaker().weakKeys().makeComputingMap(new Function<Document, Frizzle>() {
+    private static final LoadingCache<Document, Frizzle> FRIZZLES = CacheBuilder.newBuilder().weakKeys().build(new CacheLoader<Document, Frizzle>() {
         @Override
-        public Frizzle apply(Document document) {
+        public Frizzle load(Document document) {
             return new Frizzle(document);
         }
     });
@@ -652,7 +653,7 @@ public class Q implements Iterable<Element> {
     private static final ConcurrentMap<String, Pseudo> PSEUDOS = Maps.newConcurrentMap();
 
     private Frizzle frizzle() {
-        Frizzle frizzle = FRIZZLES.get(document());
+        Frizzle frizzle = FRIZZLES.getUnchecked(document());
 
         synchronized (frizzle) {
             for (Pseudo pseudo : PSEUDOS.values()) {
@@ -667,13 +668,8 @@ public class Q implements Iterable<Element> {
 
     private String nodesToString(NodeList nodes) throws XmlException {
         StringWriter result = new StringWriter();
-
-        try {
-            nodesToWriterOrStream(nodes, result, null);
-            return result.toString();
-        } finally {
-            Closeables.closeQuietly(result);
-        }
+        nodesToWriterOrStream(nodes, result, null);
+        return result.toString();
     }
 
     private void nodesToWriterOrStream(NodeList nodes, Writer writer, OutputStream stream) throws XmlException {

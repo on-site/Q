@@ -143,7 +143,7 @@ public class Q implements Iterable<Element> {
      * the inserted root will be selected (if there are any, otherwise
      * it will be an empty set of selected elements).
      *
-     * @param reader The xml to parse.
+     * @param file The xml to parse.
      * @throws XmlException If there is a problem reading.
      */
     public Q(File file) throws XmlException {
@@ -392,7 +392,7 @@ public class Q implements Iterable<Element> {
      * the inserted root will be selected (if there are any, otherwise
      * it will be an empty set of selected elements).
      *
-     * @param reader The xml to parse.
+     * @param file The xml to parse.
      * @return A Q with the parsed root element(s) selected.
      * @throws XmlException If there is a problem reading.
      */
@@ -666,13 +666,13 @@ public class Q implements Iterable<Element> {
         return frizzle;
     }
 
-    private String nodesToString(NodeList nodes) throws XmlException {
+    private static String nodesToString(NodeList nodes) throws XmlException {
         StringWriter result = new StringWriter();
         nodesToWriterOrStream(nodes, result, null);
         return result.toString();
     }
 
-    private void nodesToWriterOrStream(NodeList nodes, Writer writer, OutputStream stream) throws XmlException {
+    private static void nodesToWriterOrStream(NodeList nodes, Writer writer, OutputStream stream) throws XmlException {
         if (writer != null && stream != null) {
             throw new IllegalArgumentException("Only one of a writer or stream is allowed!");
         }
@@ -750,7 +750,7 @@ public class Q implements Iterable<Element> {
         return this.list.toArray(new Element[this.list.size()]);
     }
 
-    private NodeList xmlToNodes(String xml) throws XmlException {
+    private static NodeList xmlToNodes(String xml) throws XmlException {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.parse(new InputSource(new StringReader("<root>" + xml + "</root>")));
@@ -1739,7 +1739,7 @@ public class Q implements Iterable<Element> {
      * Returns a Q with the given element if it is a child of one of
      * the selected elements (otherwise an empty Q).
      *
-     * @param q A Q of elements to find in the selected elements.
+     * @param element the element to find in the selected elements.
      * @return A new Q with the found elements.
      */
     public Q find(Element element) {
@@ -1895,7 +1895,7 @@ public class Q implements Iterable<Element> {
      * any given apply is null, it will be ignored.  Matching elements
      * are dropped from the resulting Q.
      *
-     * @param toElement A mapping function to none or more elements to
+     * @param toElements A mapping function to none or more elements to
      * load.
      * @return A Q with all the original elements mapped to something
      * new.
@@ -2154,7 +2154,7 @@ public class Q implements Iterable<Element> {
      * Select the elements currently selected, except those where the
      * predicate returns true.
      *
-     * @param q A predicate to filter the selected items with..
+     * @param predicate A predicate to filter the selected items with.
      * @return A new Q minus the elements where the predicate returns
      * true.
      */
@@ -2449,6 +2449,7 @@ public class Q implements Iterable<Element> {
 
     // -------------- Additional utility methods not defined by jQuery --------------
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Q) {
             return o == this;
@@ -2500,6 +2501,7 @@ public class Q implements Iterable<Element> {
         }
     }
 
+    @Override
     public int hashCode() {
         return asList().hashCode();
     }

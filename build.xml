@@ -17,7 +17,7 @@
   <property name="guava.jar" location="${lib}/guava-15.0.jar" />
   <property name="frizzle.jar" location="${lib}/frizzle.jar" />
   <property name="testng.jar" location="${test.lib}/testng-6.8.jar" />
-  <property name="bsh.jar" location="${demo.lib}/bsh-2.0b2.jar" />
+  <property name="bsh.jar" location="${demo.lib}/bsh-2.0b4.jar" />
   <property name="frizzle.dir" location="frizzle" />
 
   <path id="classpath">

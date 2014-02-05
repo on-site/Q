@@ -1,8 +1,7 @@
 package com.on_site.util;
 
-import com.google.common.io.ByteStreams;
-import com.google.common.io.CharStreams;
-import com.google.common.io.InputSupplier;
+import com.google.common.io.ByteSource;
+import com.google.common.io.CharSource;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -27,13 +26,13 @@ public class IOUtil {
      * @return The joined streams into 1 InputStream.
      */
     public static InputStream join(InputStream... streams) throws IOException {
-        InputStreamSupplier[] suppliers = new InputStreamSupplier[streams.length];
+        InputStreamSource[] sources = new InputStreamSource[streams.length];
 
         for (int i = 0; i < streams.length; i++) {
-            suppliers[i] = new InputStreamSupplier(streams[i]);
+            sources[i] = new InputStreamSource(streams[i]);
         }
 
-        return ByteStreams.join(suppliers).getInput();
+        return ByteSource.concat(sources).openStream();
     }
 
     /**
@@ -45,27 +44,27 @@ public class IOUtil {
      * @return The joined readers into 1 Reader.
      */
     public static Reader join(Reader... readers) throws IOException {
-        ReaderSupplier[] suppliers = new ReaderSupplier[readers.length];
+        ReaderSource[] sources = new ReaderSource[readers.length];
 
         for (int i = 0; i < readers.length; i++) {
-            suppliers[i] = new ReaderSupplier(readers[i]);
+            sources[i] = new ReaderSource(readers[i]);
         }
 
-        return CharStreams.join(suppliers).getInput();
+        return CharSource.concat(sources).openStream();
     }
 
     /**
-     * InputSupplier for InputStream objects.
+     * ByteSource for InputStream objects.
      */
-    public static class InputStreamSupplier implements InputSupplier<InputStream> {
+    public static class InputStreamSource extends ByteSource {
         private final InputStream stream;
 
         /**
-         * Construct the supplier with the given stream.
+         * Construct the source with the given stream.
          *
          * @param stream The stream to construct with.
          */
-        public InputStreamSupplier(InputStream stream) {
+        public InputStreamSource(InputStream stream) {
             this.stream = stream;
         }
 
@@ -74,23 +73,24 @@ public class IOUtil {
          *
          * @return The stream this object was constructed with.
          */
-        public InputStream getInput() {
+        @Override
+        public InputStream openStream() {
             return stream;
         }
     }
 
     /**
-     * InputSupplier for Reader objects.
+     * CharSource for Reader objects.
      */
-    public static class ReaderSupplier implements InputSupplier<Reader> {
+    public static class ReaderSource extends CharSource {
         private final Reader reader;
 
         /**
-         * Construct the supplier with the given reader.
+         * Construct the source with the given reader.
          *
          * @param reader The reader to construct with.
          */
-        public ReaderSupplier(Reader reader) {
+        public ReaderSource(Reader reader) {
             this.reader = reader;
         }
 
@@ -99,7 +99,8 @@ public class IOUtil {
          *
          * @return The reader this object was constructed with.
          */
-        public Reader getInput() {
+        @Override
+        public Reader openStream() {
             return reader;
         }
     }

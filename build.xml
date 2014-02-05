@@ -14,7 +14,7 @@
   <property name="demo.jar" location="${demo.dist}/demo.jar" />
   <property name="demo.lib" location="demo/lib" />
   <property name="rhino.jar" location="${lib}/js.jar" />
-  <property name="guava.jar" location="${lib}/guava-15.0.jar" />
+  <property name="guava.jar" location="${lib}/guava-16.0.1.jar" />
   <property name="frizzle.jar" location="${lib}/frizzle.jar" />
   <property name="testng.jar" location="${test.lib}/testng-6.8.jar" />
   <property name="bsh.jar" location="${demo.lib}/bsh-2.0b4.jar" />

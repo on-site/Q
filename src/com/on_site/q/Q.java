@@ -1258,6 +1258,9 @@ public class Q implements Iterable<Element> {
      * @return This Q.
      */
     public Q text(ElementToString map) {
+        if (map == null) {
+            return this.text("");
+        }
         for (Element element : this) {
             element.setTextContent(map.apply(element));
         }

@@ -1254,13 +1254,17 @@ public class Q implements Iterable<Element> {
      * been returned (so you may inspect the xml/text contents within
      * the function).
      *
+     * Note that nothing will be changed and this will be returned if
+     * a null mapping function is provided.
+     *
      * @param map a mapping function of element to text.
      * @return This Q.
      */
     public Q text(ElementToString map) {
         if (map == null) {
-            return this.text("");
+            return this;
         }
+
         for (Element element : this) {
             element.setTextContent(map.apply(element));
         }

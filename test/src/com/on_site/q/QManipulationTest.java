@@ -676,6 +676,16 @@ public class QManipulationTest extends TestBase {
     }
 
     @Test
+    public void textNullMap() throws Exception {
+        Q q = $("sub", document("<test><sub>Content <b>with some</b> sub content. <endingTag value=\"something\"/></sub><sub>content</sub><sub /></test>"));
+        final int[] i = new int[] { 0 };
+        q.text((ElementToString) null);
+        assertEquals($("sub:eq(0)", q.document()).text(), "Content with some sub content. ", "Text");
+        assertEquals($("sub:eq(1)", q.document()).text(), "content", "Text");
+        assertEquals($("sub:eq(2)", q.document()).text(), "", "Text");
+    }
+
+    @Test
     public void textTextWithXmlCharacters() throws Exception {
         Q q = $("sub", $("<test><sub>Some <b>content</b></sub></test>"));
         q.text("this is a <test/> & it's \"fun\"");

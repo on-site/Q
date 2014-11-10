@@ -216,4 +216,52 @@ public class QAdditionalTest extends TestBase {
         out.close();
         assertEquals(out.toString(), "", "XML");
     }
+
+    @Test
+    public void writeNode() throws Exception {
+        Q q = $("<test>This is a <b>valid</b> document with<br/> a root.</test>").find("b");
+        assertEquals(q.writeNode(), "<b>valid</b>", "XML");
+
+        assertEquals($().writeNode(), null, "XML");
+    }
+
+    @Test
+    public void writeNodeFile() throws Exception {
+        File out = tempFile();
+        Q q = $("<test>This is a <b>valid</b> document with<br/> a root.</test>").find("b");
+        q.writeNode(out);
+        assertEquals(Files.toString(out, Charsets.UTF_8), "<b>valid</b>", "XML");
+
+        out = tempFile();
+        $().writeNode(out);
+        assertEquals(Files.toString(out, Charsets.UTF_8), "", "XML");
+    }
+
+    @Test
+    public void writeNodeOutputStream() throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Q q = $("<test>This is a <b>valid</b> document with<br/> a root.</test>").find("b");
+        q.writeNode(out);
+        out.close();
+        assertEquals(out.toString(), "<b>valid</b>", "XML");
+
+        out = new ByteArrayOutputStream();
+        $().writeNode(out);
+        out.close();
+        assertEquals(out.toString(), "", "XML");
+    }
+
+    @Test
+    public void writeNodeWriter() throws Exception {
+        StringWriter out = new StringWriter();
+        Q q = $("<test>This is a <b>valid</b> document with<br/> a root.</test>").find("b");
+        q.writeNode(out);
+        out.close();
+        assertEquals(out.toString(), "<b>valid</b>", "XML");
+
+        out = new StringWriter();
+        $().writeNode(out);
+        out.close();
+        assertEquals(out.toString(), "", "XML");
+    }
 }

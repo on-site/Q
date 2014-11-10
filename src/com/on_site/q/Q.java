@@ -34,6 +34,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -2613,6 +2614,105 @@ public class Q implements Iterable<Element> {
         }
 
         nodesToWriterOrStream(new SingleNodeList(document().getDocumentElement()), writer, null);
+        return this;
+    }
+
+    /**
+     * Return the first node selected for this Q written to a
+     * string.  If there is no node associated with it, then null
+     * is returned (which can happen if $() is called).
+     *
+     * @return The current node as a string.
+     * @throws XmlException If there is a problem transforming xml.
+     */
+    public String writeNode() throws XmlException {
+        if (document() == null) {
+            return null;
+        }
+
+        return new Q("<ROOT/>").append(this.get(0)).xml();
+    }
+
+    /**
+     * Write the first node selected for this Q to the given
+     * file.  If there is no document associated with it, then this
+     * method immediately returns this without doing anything (which
+     * can happen if $() is called).
+     *
+     * @param file The file to write the xml to.
+     * @return This Q.
+     * @throws XmlException If there is a problem transforming xml or
+     * writing to the file.
+     */
+    public Q writeNode(File file) throws XmlException {
+        if (document() == null) {
+            return this;
+        }
+
+        try {
+            FileWriter out = new FileWriter(file);
+
+            try {
+                out.write(this.writeNode());
+                return this;
+            } finally {
+                out.close();
+            }
+        } catch (IOException e) {
+            throw new XmlException("There was a problem while writing to the file.", e);
+        }
+    }
+
+    /**
+     * Write the first node selected from this Q to the given
+     * outputStream.  If there is no document associated with it, then
+     * this method immediately returns this without doing anything
+     * (which can happen if $() is called).
+     *
+     * Note that the outputStream is not explicitly closed from this
+     * method.
+     *
+     * @param outputStream The stream to write the xml to.
+     * @return This Q.
+     * @throws XmlException If there is a problem transforming xml.
+     */
+    public Q writeNode(OutputStream outputStream) throws XmlException {
+        if (document() == null) {
+            return this;
+        }
+
+        try {
+            outputStream.write(writeNode().getBytes(Charset.forName("UTF-8")));
+        } catch (IOException e) {
+            throw new XmlException("There was a problem while writing to the outputStream.", e);
+        }
+
+        return this;
+    }
+
+    /**
+     * Write the first node selected from this Q to the given
+     * writer.  If there is no document associated with it, then this
+     * method immediately returns this without doing anything (which
+     * can happen if $() is called).
+     *
+     * Note that the writer is not explicitly closed from this method.
+     *
+     * @param writer The writer to write the xml to.
+     * @return This Q.
+     * @throws XmlException If there is a problem transforming xml.
+     */
+    public Q writeNode(Writer writer) throws XmlException {
+        if (document() == null) {
+            return this;
+        }
+
+        try {
+            writer.write(writeNode());
+        } catch (IOException e) {
+            throw new XmlException("There was a problem while writing to the writer.", e);
+        }
+
         return this;
     }
 }

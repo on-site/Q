@@ -870,6 +870,23 @@ public class Q implements Iterable<Element> {
         return this;
     }
 
+    /**
+     * Remove selected elements in current Q.
+     *
+     * @return This Q.
+     */
+    public Q remove() {
+        for (Element element : this) {
+            Node parent = element.getParentNode();
+
+            if (parent != null) {
+                parent.removeChild(element);
+            }
+        }
+
+        return this;
+    }
+
     // -------------- Internals --------------
 
     /**
@@ -1191,7 +1208,6 @@ public class Q implements Iterable<Element> {
     }
 
     // prependTo
-    // remove
     // replaceAll
     // replaceWith
 

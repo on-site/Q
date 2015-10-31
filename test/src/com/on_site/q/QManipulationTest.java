@@ -629,6 +629,21 @@ public class QManipulationTest extends TestBase {
     }
 
     @Test
+    public void remove() throws Exception {
+        String testXML = "<test><rub>Hello </rub><sub>there </sub><bub>World</bub></test>";
+        String expectedXML = "<rub>Hello </rub><bub>World</bub>";
+        String expectedRemovedXML = "there ";
+
+        Q q = $(testXML);
+        Q sub = q.find("sub");
+
+        Q removedItem = sub.remove();
+
+        assertEquals(removedItem.xml(), expectedRemovedXML, "XML");
+        assertEquals(q.xml(), expectedXML, "XML");
+    }
+
+    @Test
     public void text() throws Exception {
         Q q = $("sub", $("<test><sub>Content <b>with some</b> sub content. <endingTag value=\"something\"/></sub><sub>content</sub><sub /></test>"));
         assertEquals(q.text(), "Content with some sub content. ", "Text");

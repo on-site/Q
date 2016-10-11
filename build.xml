@@ -8,7 +8,8 @@
   <property name="test.lib" location="test/lib" />
   <property name="test.build" location="test/build" />
   <property name="test.reports" location="test/reports" />
-  <property name="demo.src" location="demo/src" />
+  <property name="demo.src" location="demo/src/main/java" />
+  <property name="demo.resources" location="demo/src/main/resources" />
   <property name="demo.build" location="demo/build" />
   <property name="demo.dist" location="demo/dist" />
   <property name="demo.jar" location="${demo.dist}/demo.jar" />
@@ -161,10 +162,8 @@
   </target>
 
   <target name="jar-demo" depends="compile-demo">
-    <copy file="${demo.src}/demo.bsh" todir="${demo.build}" />
-
     <copy todir="${demo.build}">
-      <fileset dir="${demo.src}" includes="**/*.xml" />
+      <fileset dir="${demo.resources}" includes="**/*" />
     </copy>
 
     <jar jarfile="${demo.jar}">

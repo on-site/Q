@@ -1,4 +1,5 @@
-// Run this by running 'java -jar demo/dist/demo.jar'
+// Run this by running 'java -jar Q-demo.jar'
+import com.on_site.q.Demo;
 import com.on_site.q.Q;
 import java.io.File;
 import java.io.InputStream;

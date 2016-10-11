@@ -1,10 +1,10 @@
 <project name="q" default="jar" basedir=".">
-  <property name="src" location="src" />
+  <property name="src" location="src/main/java" />
   <property name="build" location="build" />
   <property name="dist" location="dist" />
   <property name="q.jar" location="${dist}/q.jar" />
   <property name="lib" location="lib" />
-  <property name="test.src" location="test/src" />
+  <property name="test.src" location="src/test/java" />
   <property name="test.lib" location="test/lib" />
   <property name="test.build" location="test/build" />
   <property name="test.reports" location="test/reports" />

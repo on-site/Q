@@ -1,0 +1,10 @@
+language: java
+jdk:
+- openjdk7
+script:
+- "./configure_pom"
+- "./deploy"
+env:
+  global:
+  - secure: hdd6GQCRzYgGPgFbeVDn8UjiFFywYC5sxi/41zYpuV0/mhfGN5UtoFzAvku3lg4VPtpbqzlDih/KqjCPDpvQQu4ASPvNnNNhcS0/547PFOLWFZmbRNp43zf2SVqVkAab93qFNq8fn1Um0qpV4+OTM3oGw4O/6CvcUxhYhLwJtzI=
+  - secure: MsW+YmXpdHRTSmcQiLMwibZVCYCB+M+5mnba3uP54Tj9vfJGyE7WUTrG97HmcO31VvKOBfasrl+MUw59DtifxZ/CkSPP6a9pdEgx+Vx0Wkp9crZ6mjUzpg9pIGFAD68lNMgW3lnuq9VSODDK2VBzpVMva/maFhLfcEEUO+rIQFk=

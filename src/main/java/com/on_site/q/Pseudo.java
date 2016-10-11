@@ -16,7 +16,7 @@ public abstract class Pseudo extends com.on_site.frizzle.Pseudo {
     /**
      * Construct the Pseudo with the given name to use.
      *
-     * @param The name of the pseudo.
+     * @param name The name of the pseudo.
      */
     public Pseudo(String name) {
         this.name = name;

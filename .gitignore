@@ -2,10 +2,11 @@
 /build
 /dist
 /lib
+/target
 /test/reports
 /test/build
 /test/lib
 /demo/lib
 /demo/build
 /demo/dist
-/target
+/demo/target

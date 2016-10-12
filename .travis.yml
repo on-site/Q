@@ -3,13 +3,13 @@ jdk:
 - openjdk7
 before_install:
 - "./ci prep"
-- "cd demo && ../ci prep"
+- "(cd demo && ../ci prep)"
 install:
 - "./ci install"
-- "cd demo && ../ci install"
+- "(cd demo && ../ci install)"
 script:
 - "./ci run"
-- "cd demo && ../ci run"
+- "(cd demo && ../ci run)"
 env:
   global:
   - secure: hdd6GQCRzYgGPgFbeVDn8UjiFFywYC5sxi/41zYpuV0/mhfGN5UtoFzAvku3lg4VPtpbqzlDih/KqjCPDpvQQu4ASPvNnNNhcS0/547PFOLWFZmbRNp43zf2SVqVkAab93qFNq8fn1Um0qpV4+OTM3oGw4O/6CvcUxhYhLwJtzI=

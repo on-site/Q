@@ -646,7 +646,7 @@ public class Q implements Iterable<Element> {
         return ImmutableSet.<Element>builder().add(elements).build();
     }
 
-    private static final LoadingCache<Document, Frizzle> FRIZZLES = CacheBuilder.newBuilder().weakKeys().softValues().build(new CacheLoader<Document, Frizzle>() {
+    private static final LoadingCache<Document, Frizzle> FRIZZLES = CacheBuilder.newBuilder().weakKeys().build(new CacheLoader<Document, Frizzle>() {
         @Override
         public Frizzle load(Document document) {
             return new Frizzle(ReferenceProxies.createReferenceProxy(Document.class, new WeakReference<>(document)));

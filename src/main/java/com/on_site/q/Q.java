@@ -20,6 +20,7 @@ import com.on_site.frizzle.Frizzle;
 import com.on_site.util.DOMUtil;
 import com.on_site.util.IOUtil;
 import com.on_site.util.NodeListIterable;
+import com.on_site.util.ReferenceProxies;
 import com.on_site.util.SingleNodeList;
 import com.on_site.util.TODO;
 
@@ -34,6 +35,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.ref.WeakReference;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -644,10 +646,10 @@ public class Q implements Iterable<Element> {
         return ImmutableSet.<Element>builder().add(elements).build();
     }
 
-    private static final LoadingCache<Document, Frizzle> FRIZZLES = CacheBuilder.newBuilder().weakKeys().softValues().build(new CacheLoader<Document, Frizzle>() {
+    private static final LoadingCache<Document, Frizzle> FRIZZLES = CacheBuilder.newBuilder().weakKeys().build(new CacheLoader<Document, Frizzle>() {
         @Override
         public Frizzle load(Document document) {
-            return new Frizzle(document);
+            return new Frizzle(ReferenceProxies.createReferenceProxy(Document.class, new WeakReference<>(document)));
         }
     });
 

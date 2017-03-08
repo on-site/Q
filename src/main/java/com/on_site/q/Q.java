@@ -194,19 +194,23 @@ public class Q implements Iterable<Element> {
                     throw new NullPointerException("One of a file, reader or stream is required!");
                 }
             } catch (LSException e) {
-                // Assume the error was missing root node and try
-                // again... there isn't a typed exception so we KNOW it is
-                // because of a missing root node.
-                if (reader != null) {
-                    reader.reset();
-                    Reader combined = IOUtil.join(new StringReader("<root>"), reader, new StringReader("</root>"));
-                    document = DOMUtil.documentFromReader(combined);
-                    addedRoot = true;
-                } else {
-                    stream.reset();
-                    InputStream combined = IOUtil.join(new ByteArrayInputStream("<root>".getBytes()), stream, new ByteArrayInputStream("</root>".getBytes()));
-                    document = DOMUtil.documentFromStream(combined);
-                    addedRoot = true;
+                try {
+                    // Assume the error was missing root node and try
+                    // again... there isn't a typed exception so we KNOW it is
+                    // because of a missing root node.
+                    if (reader != null) {
+                        reader.reset();
+                        Reader combined = IOUtil.join(new StringReader("<root>"), reader, new StringReader("</root>"));
+                        document = DOMUtil.documentFromReader(combined);
+                        addedRoot = true;
+                    } else {
+                        stream.reset();
+                        InputStream combined = IOUtil.join(new ByteArrayInputStream("<root>".getBytes()), stream, new ByteArrayInputStream("</root>".getBytes()));
+                        document = DOMUtil.documentFromStream(combined);
+                        addedRoot = true;
+                    }
+                } catch (Exception err) {
+                    throw new IllegalStateException("Error while trying to auto correct for exception.", e);
                 }
             }
 
